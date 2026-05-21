@@ -83,6 +83,104 @@ export const URGENCY_LEVELS = {
   critical: { label: 'Critical', color: 'text-danger-600', bg: 'bg-danger-100' },
 };
 
+// ============================================================
+// MAHIKENG MUNICIPAL DEPARTMENTS
+// ============================================================
+export const DEPARTMENTS = {
+  roads: {
+    name: 'Roads & Stormwater',
+    shortName: 'Roads',
+    icon: '🛣️',
+    color: 'text-orange-700',
+    bg: 'bg-orange-50',
+    border: 'border-orange-200',
+    head: 'Director: Roads & Stormwater',
+    phone: '018 381 8200',
+    email: 'roads@mahikeng.gov.za',
+    categories: ['pothole'],
+  },
+  water: {
+    name: 'Water Services',
+    shortName: 'Water',
+    icon: '💧',
+    color: 'text-blue-700',
+    bg: 'bg-blue-50',
+    border: 'border-blue-200',
+    head: 'Director: Water Services',
+    phone: '018 381 8300',
+    email: 'water@mahikeng.gov.za',
+    categories: ['water_leak'],
+  },
+  sanitation: {
+    name: 'Sanitation & Sewerage',
+    shortName: 'Sanitation',
+    icon: '🚰',
+    color: 'text-red-700',
+    bg: 'bg-red-50',
+    border: 'border-red-200',
+    head: 'Director: Sanitation',
+    phone: '018 381 8310',
+    email: 'sanitation@mahikeng.gov.za',
+    categories: ['sewage'],
+  },
+  electricity: {
+    name: 'Electricity & Energy',
+    shortName: 'Electricity',
+    icon: '⚡',
+    color: 'text-purple-700',
+    bg: 'bg-purple-50',
+    border: 'border-purple-200',
+    head: 'Director: Electricity',
+    phone: '018 381 8320',
+    email: 'electricity@mahikeng.gov.za',
+    categories: ['streetlight', 'electricity'],
+  },
+  waste: {
+    name: 'Waste Management',
+    shortName: 'Waste',
+    icon: '♻️',
+    color: 'text-green-700',
+    bg: 'bg-green-50',
+    border: 'border-green-200',
+    head: 'Director: Waste Management',
+    phone: '018 381 8330',
+    email: 'waste@mahikeng.gov.za',
+    categories: ['illegal_dumping'],
+  },
+  housing: {
+    name: 'Housing & Human Settlements',
+    shortName: 'Housing',
+    icon: '🏠',
+    color: 'text-indigo-700',
+    bg: 'bg-indigo-50',
+    border: 'border-indigo-200',
+    head: 'Director: Housing',
+    phone: '018 381 8340',
+    email: 'housing@mahikeng.gov.za',
+    categories: ['housing'],
+  },
+  community: {
+    name: 'Community & Customer Services',
+    shortName: 'Customer Services',
+    icon: '🏛️',
+    color: 'text-gray-700',
+    bg: 'bg-gray-50',
+    border: 'border-gray-200',
+    head: 'Director: Community Services',
+    phone: '018 381 8100',
+    email: 'info@mahikeng.gov.za',
+    categories: ['other'],
+  },
+};
+
+// Category -> Department lookup
+export const CATEGORY_TO_DEPARTMENT = {};
+Object.entries(DEPARTMENTS).forEach(([key, dept]) => {
+  dept.categories.forEach(cat => {
+    CATEGORY_TO_DEPARTMENT[cat] = key;
+  });
+});
+
 /**
  * Check if device is online
  */

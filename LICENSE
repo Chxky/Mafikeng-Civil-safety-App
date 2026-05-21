@@ -1,37 +1,110 @@
-MIT License
+MAHIKENG CIVIC SAFETY PWA — SOURCE-AVAILABLE LICENSE
 
-Copyright (c) 2026 Pardon Mahara
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Copyright (c) 2026 Pardon Mahara. All Rights Reserved.
 
 ================================================================================
-MAHIKENG CIVIC SAFETY PWA
+AUTHOR
 ================================================================================
-Author:       Pardon Mahara
+Name:         Pardon Mahara
 Year:         2026
 Location:     Mahikeng, North West Province, South Africa
-Purpose:      Civic infrastructure reporting and community safety platform
-Compliance:   POPI Act (Protection of Personal Information Act, 2013)
 
-This application was built to serve the residents of Mahikeng by bridging
-the gap between the community, the municipality, and emergency services.
-It is free software, released under the MIT License, and may be used,
-modified, and distributed by anyone for the benefit of their community.
+================================================================================
+LICENSE TERMS
+================================================================================
+
+This software and all associated documentation files (the "Software") are the
+exclusive intellectual property of Pardon Mahara. By accessing, installing, or
+using this Software, you agree to the following terms:
+
+1. PERMISSION TO USE
+
+   You are granted a non-exclusive, non-transferable, revocable license to USE
+   this Software for its intended purpose — civic reporting, community safety,
+   and public service delivery — subject to the restrictions below.
+
+2. YOU MAY
+
+   a) Install and run the Software on your own devices or servers.
+   b) View and read the source code for the purpose of understanding how it
+      works.
+   c) Use the Software to submit civic reports, access safety information, and
+      use all features as an end user.
+   d) Deploy the Software on your own infrastructure for use by your community,
+      provided no modifications are made to the source code.
+
+3. YOU MAY NOT
+
+   a) MODIFY, adapt, alter, or create derivative works of the Software or any
+      part thereof, in source code or compiled form.
+   b) REDISTRIBUTE, sell, sublicense, lease, or otherwise transfer the Software
+      or any modified version of it to any third party.
+   c) REMOVE, alter, or obscure this license, the copyright notice, or the
+      author attribution from the Software.
+   d) USE the Software or its code in any product or service that competes
+      with, replaces, or replicates the Mahikeng Civic Safety PWA without
+      explicit written permission from the author.
+   e) CLAIM ownership or authorship of the Software or any part thereof.
+   f) REVERSE ENGINEER, decompile, or disassemble the compiled Software except
+      as permitted by applicable law.
+   g) USE the Software for any commercial purpose that generates revenue
+      directly from the Software itself (e.g., selling access, selling the code,
+      offering it as a white-label product) without a commercial license from
+      the author.
+
+4. SOLE RIGHT TO MODIFY
+
+   Only the author, Pardon Mahara, has the right to modify, update, fork,
+   redistribute, and create derivative works of this Software. Any modifications
+   or updates will be released exclusively by the author through the official
+   repository.
+
+5. CONTRIBUTIONS
+
+   If you submit code, suggestions, bug fixes, or other contributions to this
+   project, you grant Pardon Mahara a perpetual, irrevocable, worldwide,
+   royalty-free license to use, modify, and incorporate your contributions into
+   the Software without compensation or attribution.
+
+6. ENFORCEMENT
+
+   Violation of these terms constitutes copyright infringement and may result in
+   legal action. The author reserves the right to pursue all available legal
+   remedies, including but not limited to injunctive relief and damages.
+
+7. NO WARRANTY
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN
+   ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN
+   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+8. GOVERNING LAW
+
+   This license shall be governed by the laws of the Republic of South Africa.
+   Any disputes arising from this license shall be subject to the exclusive
+   jurisdiction of the courts of South Africa.
+
+================================================================================
+COMMERCIAL LICENSING
+================================================================================
+
+If you wish to use this Software for commercial purposes, modify the code,
+redistribute it, or create derivative works, you must obtain a commercial
+license from the author. Contact:
+
+  Pardon Mahara
+  Mahikeng, North West Province, South Africa
+
+================================================================================
+THIS APPLICATION
+================================================================================
+
+Mahikeng Civic Safety PWA is a civic infrastructure reporting and community
+safety platform built for the residents of Mahikeng. It is not open-source
+software. The source code is made available for transparency and auditability,
+but all modification and redistribution rights are reserved by the author.
 
 ================================================================================

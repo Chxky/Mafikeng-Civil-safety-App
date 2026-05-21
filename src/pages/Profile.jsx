@@ -5,6 +5,7 @@ import { useNetwork } from '../hooks/useNetwork';
 import { getCivicReports, getDashboardStats } from '../db/mockApi';
 import { getEmergencyContacts, saveEmergencyContacts } from '../db/offline';
 import { showToast } from '../utils/helpers';
+import { requestNotificationPermission, subscribeToPush, unsubscribeFromPush, isSubscribed } from '../utils/notifications';
 
 export default function Profile() {
   const { user } = useAuth();
@@ -16,6 +17,8 @@ export default function Profile() {
   const [newContact, setNewContact] = useState({ name: '', phone: '' });
   const [myReportsCount, setMyReportsCount] = useState(0);
   const [stats, setStats] = useState(null);
+  const [pushEnabled, setPushEnabled] = useState(false);
+  const [pushLoading, setPushLoading] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -23,17 +26,47 @@ export default function Profile() {
 
   async function loadData() {
     try {
-      const [contactsData, reportsRes, statsRes] = await Promise.all([
+      const [contactsData, reportsRes, statsRes, subscribed] = await Promise.all([
         getEmergencyContacts(),
         getCivicReports({ userTokenId: user?.id }),
         getDashboardStats(),
+        isSubscribed(),
       ]);
+      setPushEnabled(subscribed);
       setContacts(contactsData);
       setMyReportsCount(reportsRes.data?.length || 0);
       setStats(statsRes.data);
     } catch (err) {
       console.error('Failed to load profile data:', err);
     }
+  }
+
+  async function handleTogglePush() {
+    setPushLoading(true);
+    try {
+      if (pushEnabled) {
+        await unsubscribeFromPush(user?.id);
+        setPushEnabled(false);
+        showToast?.('Notifications disabled', 'info');
+      } else {
+        const { granted, error } = await requestNotificationPermission();
+        if (!granted) {
+          showToast?.(error || 'Permission denied', 'error');
+          setPushLoading(false);
+          return;
+        }
+        const { error: subError } = await subscribeToPush(user?.id);
+        if (subError) {
+          showToast?.(subError, 'error');
+        } else {
+          setPushEnabled(true);
+          showToast?.('Notifications enabled', 'success');
+        }
+      }
+    } catch (err) {
+      showToast?.('Failed to update notifications', 'error');
+    }
+    setPushLoading(false);
   }
 
   async function handleAddContact() {
@@ -276,6 +309,37 @@ export default function Profile() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
             </svg>
           </button>
+        </div>
+      </div>
+
+      {/* Notification Settings */}
+      <div className="px-4 mt-4">
+        <h3 className="section-title">Notifications</h3>
+        <div className="card">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-civic-100 flex items-center justify-center">
+                <svg className="w-5 h-5 text-civic-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium">Push Notifications</p>
+                <p className="text-xs text-gray-400">SOS alerts and report updates</p>
+              </div>
+            </div>
+            <button
+              onClick={handleTogglePush}
+              disabled={pushLoading}
+              className={`w-12 h-7 rounded-full transition-colors relative ${
+                pushEnabled ? 'bg-safety-500' : 'bg-gray-300'
+              }`}
+            >
+              <div className={`w-5 h-5 rounded-full bg-white shadow absolute top-1 transition-transform ${
+                pushEnabled ? 'translate-x-6' : 'translate-x-1'
+              }`} />
+            </button>
+          </div>
         </div>
       </div>
 

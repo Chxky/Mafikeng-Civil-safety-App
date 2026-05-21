@@ -1,14 +1,14 @@
 import { openDB } from 'idb';
 
 const DB_NAME = 'mahikeng-offline';
-const DB_VERSION = 1;
+const DB_VERSION = 3;
 
 let dbPromise = null;
 
 function getDB() {
   if (!dbPromise) {
     dbPromise = openDB(DB_NAME, DB_VERSION, {
-      upgrade(db) {
+      upgrade(db, oldVersion) {
         // Pending civic reports (offline queue)
         if (!db.objectStoreNames.contains('pendingReports')) {
           const reportStore = db.createObjectStore('pendingReports', { keyPath: 'id' });
@@ -48,6 +48,33 @@ function getDB() {
         // Draft reports
         if (!db.objectStoreNames.contains('drafts')) {
           db.createObjectStore('drafts', { keyPath: 'id' });
+        }
+
+        // Power module: cached ESP schedule
+        if (!db.objectStoreNames.contains('powerCache')) {
+          db.createObjectStore('powerCache', { keyPath: 'key' });
+        }
+
+        // Power module: business profiles
+        if (!db.objectStoreNames.contains('businessProfiles')) {
+          const store = db.createObjectStore('businessProfiles', { keyPath: 'id' });
+          store.createIndex('userId', 'user_token_id');
+        }
+
+        // EduTrans: cached transport data
+        if (!db.objectStoreNames.contains('transportCache')) {
+          db.createObjectStore('transportCache', { keyPath: 'key' });
+        }
+
+        // EduTrans: learner data (encrypted)
+        if (!db.objectStoreNames.contains('learnerData')) {
+          const store = db.createObjectStore('learnerData', { keyPath: 'id' });
+          store.createIndex('parentToken', 'parent_user_token');
+        }
+
+        // Disaster Shield: cached warnings and resources
+        if (!db.objectStoreNames.contains('disasterCache')) {
+          db.createObjectStore('disasterCache', { keyPath: 'key' });
         }
       },
     });
@@ -165,6 +192,46 @@ export async function getDrafts() {
 export async function removeDraft(id) {
   const db = await getDB();
   await db.delete('drafts', id);
+}
+
+// ============================================================
+// POWER MODULE CACHE
+// ============================================================
+export async function cacheSchedule(schedule) {
+  const db = await getDB();
+  await db.put('powerCache', { key: 'schedule', data: schedule, cachedAt: Date.now() });
+}
+
+export async function getCachedSchedule() {
+  const db = await getDB();
+  const entry = await db.get('powerCache', 'schedule');
+  return entry?.data || null;
+}
+
+export async function cachePowerStatus(status) {
+  const db = await getDB();
+  await db.put('powerCache', { key: 'status', data: status, cachedAt: Date.now() });
+}
+
+export async function getCachedPowerStatus() {
+  const db = await getDB();
+  const entry = await db.get('powerCache', 'status');
+  return entry?.data || null;
+}
+
+export async function saveBusinessProfile(profile) {
+  const db = await getDB();
+  await db.put('businessProfiles', profile);
+}
+
+export async function getBusinessProfiles() {
+  const db = await getDB();
+  return db.getAll('businessProfiles');
+}
+
+export async function removeBusinessProfile(id) {
+  const db = await getDB();
+  await db.delete('businessProfiles', id);
 }
 
 // ============================================================

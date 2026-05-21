@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentPosition, reverseGeocode } from '../utils/geolocation';
-import { compressImage, CATEGORIES, URGENCY_LEVELS, isOnline, showToast } from '../utils/helpers';
-import { submitReport } from '../db/mockApi';
+import { compressImage, CATEGORIES, URGENCY_LEVELS, DEPARTMENTS, CATEGORY_TO_DEPARTMENT, isOnline, showToast } from '../utils/helpers';
+import { submitReport, uploadPhoto } from '../db/mockApi';
 import { addPendingReport, saveDraft, getDrafts, removeDraft } from '../db/offline';
 import { useAuth } from '../hooks/useAuth';
 import { useNetwork } from '../hooks/useNetwork';
@@ -25,8 +25,12 @@ export default function Report() {
   const [photoPreview, setPhotoPreview] = useState([]);
   const [loadingLocation, setLoadingLocation] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [drafts, setDrafts] = useState([]);
+  const [drafts, setDrafts] = useState(false);
   const [showDrafts, setShowDrafts] = useState(false);
+  // Power outage fields
+  const [outageType, setOutageType] = useState('unknown');
+  const [estimatedRestoration, setEstimatedRestoration] = useState('');
+  const [isBusinessAlert, setIsBusinessAlert] = useState(false);
 
   useEffect(() => {
     loadDrafts();
@@ -83,20 +87,35 @@ export default function Report() {
 
     setSubmitting(true);
 
-    const report = {
-      user_token_id: user?.id,
-      category,
-      title: title || `${CATEGORIES[category]?.label || 'Issue'} report`,
-      description,
-      latitude: location?.lat || -25.8653,
-      longitude: location?.lng || 25.6441,
-      address,
-      urgency,
-      photo_urls: photoPreview,
-      video_urls: [],
-    };
-
     try {
+      // Upload photos if any
+      let uploadedUrls = [];
+      if (photos.length > 0) {
+        const uploads = await Promise.all(
+          photos.map((file, i) => uploadPhoto(file, `${category}/${Date.now()}-${i}`))
+        );
+        uploadedUrls = uploads.filter(u => !u.error).map(u => u.data.url);
+      }
+
+      const report = {
+        user_token_id: user?.id,
+        category,
+        title: title || `${CATEGORIES[category]?.label || 'Issue'} report`,
+        description,
+        latitude: location?.lat || -25.8653,
+        longitude: location?.lng || 25.6441,
+        address,
+        urgency,
+        photo_urls: uploadedUrls,
+        video_urls: [],
+      };
+
+      // Add power outage specific fields
+      if (category === 'electricity') {
+        report.outage_type = outageType;
+        report.estimated_restoration = estimatedRestoration || null;
+        report.is_business_alert = isBusinessAlert;
+      }
       if (online) {
         await submitReport(report);
         showToast?.('Report submitted successfully!', 'success');
@@ -255,6 +274,25 @@ export default function Report() {
             </button>
           </div>
 
+          {/* Department routing info */}
+          {(() => {
+            const deptKey = CATEGORY_TO_DEPARTMENT[category];
+            const dept = DEPARTMENTS[deptKey];
+            if (!dept) return null;
+            return (
+              <div className={`rounded-xl border p-3 ${dept.border} ${dept.bg}`}>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{dept.icon}</span>
+                  <div>
+                    <p className="text-xs font-medium text-gray-500">Routed to</p>
+                    <p className={`text-sm font-bold ${dept.color}`}>{dept.name}</p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-400 mt-1">{dept.phone} • {dept.email}</p>
+              </div>
+            );
+          })()}
+
           {/* Title */}
           <div>
             <label className="text-sm font-medium text-gray-700 mb-1 block">Title</label>
@@ -298,6 +336,65 @@ export default function Report() {
               ))}
             </div>
           </div>
+
+          {/* Power Outage Fields (only when electricity selected) */}
+          {category === 'electricity' && (
+            <div className="space-y-3 p-3 bg-purple-50 rounded-xl border border-purple-200">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-lg">⚡</span>
+                <span className="text-sm font-bold text-purple-800">Power Outage Details</span>
+              </div>
+
+              {/* Outage Type */}
+              <div>
+                <label className="text-xs font-medium text-gray-700 mb-1.5 block">Outage Type</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { key: 'scheduled', label: 'Load Shedding', icon: '📅' },
+                    { key: 'unscheduled', label: 'Fault', icon: '🔧' },
+                    { key: 'unknown', label: 'Unknown', icon: '❓' },
+                  ].map(opt => (
+                    <button
+                      key={opt.key}
+                      onClick={() => setOutageType(opt.key)}
+                      className={`py-2 px-2 rounded-lg text-xs font-medium border transition-colors ${
+                        outageType === opt.key
+                          ? 'bg-purple-100 text-purple-700 border-purple-300'
+                          : 'border-gray-200 text-gray-500'
+                      }`}
+                    >
+                      {opt.icon} {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Estimated Restoration */}
+              <div>
+                <label className="text-xs font-medium text-gray-700 mb-1 block">Estimated Restoration (optional)</label>
+                <input
+                  type="datetime-local"
+                  value={estimatedRestoration}
+                  onChange={(e) => setEstimatedRestoration(e.target.value)}
+                  className="input text-sm"
+                />
+              </div>
+
+              {/* Business Alert */}
+              <label className="flex items-start gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isBusinessAlert}
+                  onChange={(e) => setIsBusinessAlert(e.target.checked)}
+                  className="mt-1 rounded border-gray-300 text-purple-600"
+                />
+                <div>
+                  <span className="text-xs font-medium text-gray-700">I am a business — send me alerts for outages in this area</span>
+                  <p className="text-xs text-gray-400 mt-0.5">Get instant notifications when outages are reported near your business</p>
+                </div>
+              </label>
+            </div>
+          )}
 
           {/* Location */}
           <div>

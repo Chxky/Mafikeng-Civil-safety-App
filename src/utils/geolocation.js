@@ -147,19 +147,30 @@ export function getMahikengBounds() {
 }
 
 /**
- * Reverse geocode (mock - returns nearby street name)
+ * Reverse geocode using Nominatim (free, no API key)
+ * Falls back to coordinates if request fails
  */
 export async function reverseGeocode(lat, lng) {
-  // In production, use Nominatim or similar
-  const streets = [
-    'Station Road', 'Main Road', 'Church Street', 'Buffalo Road',
-    'Sekame Street', 'First Avenue', 'Nelson Mandela Drive',
-    'Temba Road', 'Lotlamoreng Road', 'Montshiwa Road',
-  ];
+  try {
+    const resp = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
+      { headers: { 'Accept-Language': 'en' } }
+    );
 
-  // Use coordinates to deterministically pick a street
-  const idx = Math.abs(Math.floor((lat * 1000 + lng * 1000))) % streets.length;
-  const num = Math.abs(Math.floor(lat * 10000)) % 200 + 1;
+    if (!resp.ok) throw new Error('Geocoding failed');
 
-  return `${num} ${streets[idx]}, Mahikeng`;
+    const data = await resp.json();
+
+    if (data.address) {
+      const { road, suburb, neighbourhood } = data.address;
+      const street = road || neighbourhood || suburb;
+      const area = suburb || 'Mahikeng';
+      return street ? `${street}, ${area}` : area;
+    }
+
+    return data.display_name?.split(',').slice(0, 2).join(',').trim() || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+  } catch {
+    // Offline or rate-limited — return coordinates
+    return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+  }
 }

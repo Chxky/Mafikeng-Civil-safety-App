@@ -1,369 +1,424 @@
 # Mahikeng Civic Safety PWA
 
-**Official Community Platform for Mahikeng, North West Province, South Africa**
+> The definitive civic super-app for Mahikeng, North West Province, South Africa — a single digital platform connecting residents, businesses, and government for infrastructure reporting, community safety, emergency response, service delivery, and disaster resilience.
 
-> Copyright (c) 2026 Pardon Mahara. All Rights Reserved.
-> Licensed under the MIT License. See [LICENSE](./LICENSE).
-
----
-
-## The Problem: Why Mahikeng Needs This App
-
-Mahikeng, the capital of South Africa's North West Province, faces severe and persistent challenges that affect the daily lives of its residents. These are not abstract statistics — they are the lived reality of hundreds of thousands of people.
-
-### Infrastructure Crisis
-
-- **Raw sewage spills** flow into residential yards and streets, creating health hazards, especially for children and the elderly. Manholes overflow for weeks without response.
-- **Chronic water shortages** leave households without water for days. Burst pipes waste millions of litres while taps run dry.
-- **Potholes** large enough to damage vehicles plague every major road. Some have been reported for months without repair.
-- **Broken streetlights** leave entire neighborhoods in darkness, creating unsafe conditions for pedestrians, especially women walking at night.
-- **Power outages** (load shedding aside) caused by failing infrastructure leave families without electricity for extended periods with no communication from Eskom or the municipality.
-- **Illegal dumping** turns vacant lots into health hazards, attracting vermin and degrading property values.
-- **Stalled housing projects** leave families in temporary structures for years.
-
-### Safety and Crime Concerns
-
-- Crime is a daily reality. House break-ins, car theft, vandalism, and drug activity are reported regularly.
-- Police response times are unpredictable. Residents have lost trust in the ability of SAPS to respond quickly.
-- Community members have organized themselves into night patrols and neighborhood watch groups, but they lack coordination tools.
-- There is no single platform where residents can report safety incidents anonymously and see what is happening in their area.
-- Existing national apps (My Smart City, CityMenderSA) have not gained traction in Mahikeng. The community needs a **local** solution they can trust.
-
-### The Trust Gap
-
-- Residents do not trust that their reports reach the municipality.
-- There is no transparency about what happens after a report is filed.
-- There is no public accountability — no data on how many potholes were fixed, how many water leaks were repaired, or how long resolution takes.
-- People need to know that their data is safe, their identity is protected, and their voice matters.
+**Author:** Pardon Mahara  
+**License:** Source-Available (c) 2026 — All Rights Reserved  
+**Location:** Mahikeng, North West Province, South Africa  
+**Compliance:** POPI Act (Protection of Personal Information Act, 2013)
 
 ---
 
-## The Solution: Mahikeng Civic Safety PWA
+## Quick Start
 
-This application is a direct response to these challenges. It is not a prototype or a concept — it is a working, installable Progressive Web App built specifically for the people of Mahikeng.
+```bash
+npm install
+npm run dev          # http://localhost:3000 — runs in demo mode with mock data
+npm test             # 43 tests across 3 test files
+npm run build        # Production build in dist/
+```
 
-### What This App Does
-
-**1. Civic Infrastructure Reporting**
-- Report potholes, water leaks, sewage spills, broken streetlights, electricity outages, illegal dumping, and housing issues
-- Each report captures: geotagged location (auto-detected), photo/video, category, description, and urgency level
-- Reports are submitted to a public dashboard and a backend queue for municipality integration
-- Track report status: Pending → Acknowledged → In Progress → Resolved
-- See official municipality responses on each report
-- **Works offline** — save reports without network, auto-submit when connected
-
-**2. Community Safety and SOS**
-- **One-tap SOS panic button** on the home screen
-- Immediately sends GPS coordinates to emergency contacts via SMS
-- Triggers audible alarm and begins recording
-- **Discreet activation**: triple-tap for silent triggering in dangerous situations
-- SOS alerts forwarded to local private security and SAPS response network
-- Anonymous safety incident feed — report suspicious activity, theft, vandalism without revealing identity
-- Community verification system — "Confirm" or "Flag" incidents to reduce misinformation
-- Live crime map with heatmap hotspots showing where incidents cluster
-
-**3. Neighborhood Watch Toolkit**
-- Patrol Mode: registered watch members share live location during patrols
-- End-to-end encrypted group chat for patrollers
-- Step-by-step guide to register community safety forums with SAPS/CPF
-- Community Leaders directory with direct contact details for ward councillors, CPF members, and safety forum chairs
-
-**4. USSD/SMS Accessibility**
-- Full USSD menu simulation for feature phones without data
-- SMS bot accepts `#REPORT [description] at [address]` and `#SOS` commands
-- Auto-categorizes reports based on keywords
-- Ensures no resident is excluded because they don't have a smartphone
-
-**5. Transparency and Accountability**
-- Public dashboard showing all reported issues and their status
-- Municipality Resolution Scorecard: percentage of potholes fixed, water restored, average resolution time
-- Category-by-category performance breakdown
-- Creates public pressure for service delivery improvement
-
-**6. Emergency Numbers**
-- SAPS Emergency: **10111**
-- Mahikeng SAPS Station: **018 381 8200**
-- Ambulance / Fire: **10177**
-- Municipality Hotline: **018 381 8200**
-- All numbers are one-tap callable from within the app
-
-**7. Sign Up with Address**
-- Register with your name, phone, suburb, street address, and ward
-- Helps route reports to the correct municipality area
-- Emergency contacts stored encrypted on device only
-- No email or personal ID required — pseudonymous by design
+The app works fully in **demo mode** without any configuration. Add `.env` values to connect to Supabase, Africa's Talking, and other services.
 
 ---
 
-## Community Impact: What This App Solves
+## The Problem
 
-### For Residents
+Mahikeng, the capital of South Africa's North West Province, faces severe challenges: raw sewage spills flowing into yards, chronic water shortages, potholes damaging vehicles, broken streetlights leaving neighborhoods in darkness, power outages with no communication, illegal dumping on vacant lots, and crime that residents have lost trust in SAPS to address. The SAHRC found thousands of learners deprived of school transport, widespread use of unroadworthy vehicles, and over R1 billion paid for services never rendered. The municipality held its inaugural Disaster Management Summit in 2025, acknowledging the need to shift from reactive to proactive disaster management.
 
-| Before | After |
-|--------|-------|
-| No way to report potholes except calling the municipality and waiting on hold | 3-step report with photo, location, and status tracking |
-| No idea if anyone is working on the sewage spill in your yard | Real-time status updates: Pending → Acknowledged → In Progress → Resolved |
-| Can't report crime anonymously without fear of retaliation | Anonymous safety feed — identity hidden as "Community Member" |
-| No coordination tool for neighborhood watch patrols | Patrol Mode with live location sharing and encrypted group chat |
-| Feature phone users excluded from digital services | USSD/SMS bot works without data or smartphone |
-| No way to know if your area is safe | Live crime map with heatmap showing incident density |
-| Emergency contacts can't find you in a crisis | One-tap SOS sends GPS coordinates to all emergency contacts |
-| Don't know who your ward councillor is | Community Leaders directory with direct call/email |
-
-### For the Municipality
-
-| Before | After |
-|--------|-------|
-| Scattered reports via phone, email, walk-ins | Centralized dashboard with all reports, categories, and locations |
-| No data on resolution rates or response times | Automatic scorecard: resolution rate, average days, category breakdown |
-| No way to communicate progress to residents | Official response field on each report visible to the reporter |
-| No geographic data on where problems cluster | Interactive map with category filters and hotspot analysis |
-| No accountability mechanism | Public-facing scorecard creates transparency pressure |
-
-### For Community Safety Forums
-
-| Before | After |
-|--------|-------|
-| Coordination via WhatsApp groups (no structure) | Dedicated patrol groups with live location and encrypted chat |
-| No anonymous crime reporting | Community safety feed with verification voting |
-| Hard to register new patrol groups | Step-by-step CPF registration guide |
-| No visibility into crime patterns | Crime map with heatmap showing where incidents cluster |
-| No direct line to SAPS leadership | Community Leaders directory with CPF contacts |
-
-### For Vulnerable Residents
-
-| Before | After |
-|--------|-------|
-| Elderly/disabled can't travel to municipality offices | Report from home with photo and auto-location |
-| Women walking in dark streets have no quick SOS | Discreet triple-tap SOS triggers alarm and alerts contacts |
-| Feature phone users excluded from digital services | USSD/SMS bot accepts `#REPORT` and `#SOS` commands |
-| Residents without data can't access online services | Offline-first architecture — works without network |
-| Fear of reporting crime due to identity exposure | Anonymous reporting with location fuzzing |
+**This app is the answer.** Not a prototype — a working, installable Progressive Web App built specifically for the people of Mahikeng.
 
 ---
 
-## Technical Architecture
+## Modules (10 Integrated Modules)
 
-### Tech Stack
+### 1. Civic Infrastructure Reporting
 
-| Layer | Technology | Why |
-|-------|-----------|-----|
-| Frontend | React 18 + Vite 5 | Fast, modern, component-based |
-| Styling | Tailwind CSS 3 | Mobile-first, accessible, fast loading |
-| Routing | React Router 6 | Client-side navigation, URL-based |
-| Maps | Leaflet + OpenStreetMap | Free, no tracking, offline tile caching |
-| Offline Storage | IndexedDB (via idb) | Persistent local storage for reports and drafts |
-| PWA | vite-plugin-pwa + Workbox | Installable, offline-capable, push notifications |
-| Encryption | Web Crypto API | AES-GCM for contacts, PBKDF2 for key derivation |
-| Backend (Mock) | In-memory API | Simulates Supabase for development |
-| Database | PostgreSQL + PostGIS | Production-ready schema with spatial queries |
+Report infrastructure problems with geotagged photos, status tracking, and offline queuing.
 
-### Privacy by Design (POPI Act Compliance)
+- **Categories:** Pothole, Water Leak, Sewage, Streetlight, Electricity, Illegal Dumping, Housing, Other
+- **Flow:** Select category → fill details + capture photos → submit (or save offline) → auto-routed to responsible municipal department → track status (Pending → Acknowledged → In Progress → Resolved)
+- **Features:** GPS auto-detection, Nominatim reverse geocoding, photo compression, offline draft saving, automatic department routing, department notifications
+
+### 2. SOS & Community Safety
+
+Emergency SOS, anonymous safety feed, and live crime map.
+
+- **SOS Button:** One-tap (3-second hold) or discreet triple-tap. Sends GPS to emergency contacts via SMS, triggers siren alarm, vibrates device, pushes notifications
+- **Safety Feed:** Anonymous incident reporting with community verification (confirm/flag). Types: Suspicious Activity, Theft, Vandalism, Assault, Break-in, Car Theft, Drug Activity, Noise
+- **Crime Map:** Leaflet map with color-coded markers, heatmap hotspots, location fuzzing for privacy (~111m grid)
+
+### 3. Neighbourhood Watch Toolkit
+
+Community patrol management with real-time coordination.
+
+- Patrol groups with live GPS location sharing
+- End-to-end encrypted group chat (Supabase Realtime)
+- Emergency button alerting all parents on a route
+- Step-by-step CPF registration guide
+- Community Leaders directory (Ward Councillors, CPF, Safety Forums, Patrol Leaders)
+
+### 4. Mahikeng Power — Electricity Outage Intelligence
+
+Real-time load shedding schedules, outage reporting, and business continuity alerts.
+
+- **EskomSePush Integration:** Current stage display, daily schedule timeline, tomorrow's preview, 15-minute reminders
+- **Outage Reporting:** Scheduled (Load Shedding), Unscheduled (Fault), Unknown — with estimated restoration time
+- **Business Continuity Alerts:** Register business → set alert radius (1-5km) → get push + SMS when outages reported nearby
+- **Live Outage Map:** Color-coded markers (red=fault, orange=load shedding, yellow=unknown) with community confirmation
+- **Vehicle Permit Check:** Public lookup by registration — permit status, roadworthiness, driver PrDP
+
+### 5. Mahikeng EduTrans — School Transport Tracking & Safety
+
+Addressing systemic failures in North West Province's scholar transport system (SAHRC Investigative Report, January 2026).
+
+- **Parent Features:** Register child → live map tracking of school transport → trip status (On Time/Delayed/Arrived/Cancelled) → push notification when vehicle 5 minutes away → "My child is stranded" alert
+- **Driver Features:** Start/stop trip sessions → live GPS sharing → emergency button → trip history for compliance
+- **Vehicle Verification:** Public lookup by registration — permit status, roadworthiness, driver PrDP status
+- **Privacy:** Learner data encrypted at rest (PBKDF2 + AES-GCM-256), trip locations auto-purged after 24 hours
+
+### 6. Mahikeng Disaster Shield — Early Warning & Community Resilience
+
+Aligned with South Africa's EW4All Roadmap and Mahikeng's Disaster Management Summit goals.
+
+- **Weather Warnings:** AfriGIS/SAWS integration — Flooding, Damaging Winds, Fire Danger, Severe Thunderstorm, Extreme Heat, Heavy Rain. Severity levels: Advisory (yellow), Watch (orange), Warning (red). Push notifications, 31-day history
+- **Damage Reporting:** Flood, Veld Fire, Storm Damage, Structural Collapse — geotagged photos, urgency levels, evacuation needed flag
+- **Safety Status:** "I'm Safe" / "Need Help" markers on disaster map
+- **Volunteer Coordination:** Register with skills (First Aid, Firefighting, Shelter Management, Logistics, Counselling) → municipality deploys to specific areas
+- **Preparedness Library:** Offline guides — Flood Safety, Firebreak Construction, Evacuation Planning, First Aid, Emergency Kit
+- **Firebreak Reporting:** Self-report firebreak maintenance (National Veld and Forest Fire Act compliance)
+
+### 7. Healthcare Access
+
+- Facility directory with locations
+- Crowd-sourced queue/wait times
+- Appointment reminders
+- Medicine availability tracker
+- Facility fault reporting
+
+### 8. Water Quality Monitoring
+
+- Public dashboard of sensor readings (pH, turbidity, E. coli)
+- Treatment plant and river monitoring points
+- Community water issue reporting
+- Threshold alerts when parameters exceed safe levels
+
+### 9. Jobs & Tenders Portal
+
+- Municipal job and tender listings
+- Saved favourites
+- Keyword alerts for new postings
+
+### 10. Business Directory & Marketplace
+
+- Verified local business profiles
+- Classifieds: For Sale, Wanted, Services
+- Anonymous posting option
+
+### 11. Municipal Document Vault
+
+- IDP, SDBIP, Annual Reports, By-laws, Budgets, Disaster Plans, Council Minutes
+- Downloadable for offline reading
+- Keyword search and category filtering
+
+---
+
+## Services Hub — Home Screen
+
+The home screen features a 4-column Services Hub grid with 8 tappable service cards:
+
+| Icon | Module | Badge Behaviour |
+|------|--------|----------------|
+| ⚡ | Mahikeng Power | Red when active outage |
+| 📝 | Report Issue | — |
+| 🛡️ | Safety Feed | — |
+| 🗺️ | Crime Map | — |
+| 🚌 | EduTrans | Active trip status for your child |
+| 🛡️ | Disaster Shield | Red pulse when active warning |
+| 👥 | Leaders | — |
+| 📞 | SAPS 10111 | Direct phone call |
+
+Below the grid, contextual widgets show:
+- **TransportWidget** — Child's trip status when active
+- **DisasterWidget** — Highest-severity active weather warning
+- **PowerWidget** — Current load shedding stage and next scheduled block
+
+Bottom navigation: 🏠 Home, 📝 Report, 🛡️ Safety, 🗺️ Map, ⚡ Power, 👤 Profile
+
+---
+
+## Government Admin Dashboard
+
+Protected route (`/admin`) accessible only to users with `is_moderator` flag.
+
+**Tabs:**
+1. **Overview** — Municipality-wide stats, department performance bars, category breakdown, recent notifications
+2. **Departments** — 7 real Mahikeng municipal departments with stats, contacts, category assignments
+3. **Reports** — All civic reports with filters by department, status, urgency, category. Status update buttons with response notes
+4. **Incidents** — Safety incident moderation
+5. **Scholar Transport** — Route management, trip history, vehicle permits
+6. **Disaster Management** — Active warnings, damage reports map, volunteer coordination
+
+**Municipal Departments:**
+
+| Department | Handles | Phone |
+|-----------|---------|-------|
+| Roads & Stormwater | Pothole | 018 381 8200 |
+| Water Services | Water Leak | 018 381 8300 |
+| Sanitation & Sewerage | Sewage | 018 381 8310 |
+| Electricity & Energy | Streetlight, Electricity | 018 381 8320 |
+| Waste Management | Illegal Dumping | 018 381 8330 |
+| Housing & Human Settlements | Housing | 018 381 8340 |
+| Community & Customer Services | Other | 018 381 8100 |
+
+---
+
+## USSD/SMS Bot
+
+Feature phone support via USSD menu tree and SMS commands.
+
+| Command | Action |
+|---------|--------|
+| `#REPORT [description] at [address]` | Submit a civic report |
+| `#SOS` | Trigger emergency SOS |
+| `#TRACK [child name]` | Get latest trip status |
+| `#CHECK [vehicle reg]` | Check vehicle permit status |
+| `#WARNINGS` | Get active weather warnings |
+| `#DISASTER [type] at [location]` | Submit a damage report |
+| `#SAFE` | Mark yourself as safe |
+| `#HELP` | Request help |
+
+---
+
+## Architecture
+
+| Layer | Technology |
+|-------|-----------|
+| UI | React 18 + Vite 5 + Tailwind CSS 3 |
+| Maps | Leaflet + React-Leaflet + OpenStreetMap |
+| Database | Supabase (PostgreSQL + PostGIS) with mock fallback |
+| Offline | IndexedDB via `idb` library (12 stores, version 3) |
+| Encryption | Web Crypto API (AES-GCM-256 + PBKDF2) |
+| PWA | vite-plugin-pwa + Workbox |
+| Testing | Vitest + React Testing Library |
+| SMS/USSD | Africa's Talking (mock when not configured) |
+| Push | Web Push API with VAPID keys |
+| Weather | AfriGIS/SAWS API (mock when not configured) |
+| Load Shedding | EskomSePush API (mock when not configured) |
+
+### Dual-Mode Architecture
+
+Every API module uses a dual-mode pattern: when Supabase environment variables are set, the app connects to a live database. When they're not, it uses in-memory arrays with simulated latency. This means:
+
+- **Demo mode:** Works immediately with `npm run dev` — no accounts, no database
+- **Live mode:** Add `.env` values and the same code connects to Supabase
+
+---
+
+## Offline-First
+
+The app is designed for areas with poor connectivity:
+
+- **12 IndexedDB stores:** pending reports, cached data, drafts, transport cache, disaster cache, learner data, business profiles, power cache
+- **Auto-sync:** `SyncManager` listens for the browser `online` event and submits queued reports
+- **Draft saving:** Failed submissions saved as drafts for later completion
+- **Cache-first loading:** Widgets load cached data instantly, then refresh from API
+- **Offline resources:** Preparedness guides and weather warnings cached for offline access
+
+---
+
+## Privacy & Security (POPI Act Compliance)
 
 | Principle | Implementation |
 |-----------|---------------|
 | **Data minimization** | No email, phone, or ID required. Random token generated on device. |
-| **Purpose limitation** | Data collected only for civic reporting and safety. No advertising, no profiling. |
 | **Anonymity** | Safety reports show as "Community Member". Identity never exposed. |
-| **Location privacy** | Coordinates fuzzed to ~111m grid on public maps. Exact location only in your own reports. |
-| **Encryption at rest** | Emergency contacts encrypted with AES-GCM. Stored only on device. |
+| **Location privacy** | Coordinates fuzzed to ~111m grid on public maps. |
+| **Encryption at rest** | Emergency contacts + learner data encrypted with AES-GCM-256. |
 | **Encryption in transit** | TLS 1.3 for all API calls in production. |
-| **Storage limitation** | Emergency contacts never uploaded to server. Local-only. |
+| **Storage limitation** | Contacts and learner data never uploaded unencrypted. |
+| **Auto-purge** | Trip location history deleted after 24 hours. |
 | **Right to erasure** | User can clear all local data from Profile page. |
-| **Accountability** | Open-source code. Privacy practices auditable by anyone. |
+| **Open source** | Privacy practices auditable by anyone. |
 
-### Offline-First Architecture
+---
 
-- Service worker caches all static assets, map tiles, and API responses
-- IndexedDB stores pending reports, drafts, cached data
-- When network returns, pending reports auto-sync with notification
-- App loads in under 3 seconds on 3G networks
-- Core functionality (report drafting, contact management, USSD) works without network
+## Database Schema
+
+29 tables across 6 domains:
+
+**Core:** `user_tokens`, `civic_reports`, `safety_incidents`, `incident_confirmations`, `sos_alerts`
+
+**Patrol:** `patrol_groups`, `patrol_members`, `patrol_sessions`, `patrol_locations`, `patrol_messages`
+
+**Admin:** `department_notifications`, `sms_reports`, `push_subscriptions`
+
+**Power:** `business_profiles`, `outage_confirmations`, `business_alerts`
+
+**EduTrans:** `transport_routes`, `learners`, `trip_sessions`, `vehicle_permits`, `stranded_reports`
+
+**Disaster:** `weather_warnings`, `disaster_reports`, `user_safety_status`, `volunteers`, `volunteer_deployments`, `resilience_resources`, `firebreak_reports`, `municipal_alerts`
+
+**Materialized View:** `municipality_scorecard` — aggregated stats by category and department
+
+All tables use Row Level Security (RLS). PostGIS spatial indexes on location columns.
+
+---
+
+## API Reference
+
+**55 exported functions across 4 modules:**
+
+| Module | File | Functions |
+|--------|------|-----------|
+| Core | `src/db/mockApi.js` | 21 functions — reports, incidents, SOS, SMS, patrols, leaders, departments |
+| Power | `src/db/powerApi.js` | 9 functions — outages, business profiles, confirmations, alerts |
+| EduTrans | `src/db/transportApi.js` | 12 functions — learners, routes, trips, permits, stranded |
+| Disaster | `src/db/disasterApi.js` | 13 functions — warnings, damage reports, volunteers, resources, firebreaks |
+
+---
+
+## Environment Variables
+
+```bash
+# Required for live mode
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+
+# SMS/USSD (Africa's Talking)
+VITE_AT_API_KEY=your-api-key
+VITE_AT_USERNAME=your-username
+VITE_AT_SENDER_ID=your-sender-id
+
+# Push Notifications (VAPID)
+VITE_VAPID_PUBLIC_KEY=your-public-key
+VITE_VAPID_PRIVATE_KEY=your-private-key
+
+# EskomSePush (optional — mock when not set)
+VITE_ESP_API_KEY=your-eskomsepush-key
+
+# AfriGIS Weather Warnings (optional — mock when not set)
+VITE_AFRIGIS_API_KEY=your-afrigis-key
+```
+
+**Without any `.env` values, the app runs fully in demo mode with mock data.**
+
+---
+
+## Going Live
+
+1. Create a Supabase project at [supabase.com](https://supabase.com)
+2. Run `src/db/schema.sql` in the SQL Editor
+3. Create a Storage bucket named `report-photos` (public)
+4. Copy Supabase URL + anon key into `.env`
+5. Deploy edge function: `supabase functions deploy send-sms`
+6. Set secrets: `supabase secrets set AT_API_KEY=xxx AT_USERNAME=xxx`
+7. Generate VAPID keys: `npx web-push generate-vapid-keys`
+8. (Optional) Get free EskomSePush key at [developer.eskom.sepush.co.za](https://developer.eskom.sepush.co.za/)
+9. (Optional) Get AfriGIS key at [afrigis.co.za](https://www.afrigis.co.za/)
+10. Deploy to Vercel, Netlify, or any static host (must be HTTPS)
+
+---
+
+## Testing
+
+```bash
+npm test              # Run all tests
+npm run test:watch    # Watch mode
+```
+
+- `helpers.test.js` — 11 tests (timeAgo, formatDate, debounce, constants)
+- `geolocation.test.js` — 12 tests (fuzzLocation, getDistance, isWithinMahikeng, reverseGeocode)
+- `mockApi.test.js` — 20 tests (reports, incidents, SOS, SMS, dashboard stats)
+
+---
+
+## CI/CD
+
+GitHub Actions (`.github/workflows/ci.yml`) on push/PR to `main`/`master`:
+1. `npm ci` → `npm run lint` → `npm test` → `npm run build`
+2. Upload `dist/` as artifact (7-day retention)
 
 ---
 
 ## Project Structure
 
 ```
-mahikeng/
+mafikeng/
 ├── public/
-│   ├── icons/                    # PWA app icons
-│   └── manifest.json             # PWA install manifest
+│   ├── icons/                    # PWA icons (SVG)
+│   ├── leaflet/                  # Bundled Leaflet marker assets
+│   └── manifest.json             # PWA manifest
 ├── src/
+│   ├── api/
+│   │   └── esp.js                # EskomSePush API service
 │   ├── components/
-│   │   ├── Layout.jsx            # App shell with offline banner
-│   │   ├── BottomNav.jsx         # Bottom navigation (Home, Report, Safety, Map, Profile)
-│   │   ├── SOSButton.jsx         # Emergency SOS panic button
-│   │   ├── CopyrightFooter.jsx   # Official copyright footer
-│   │   ├── OfflineBanner.jsx     # Network status indicator
-│   │   └── Toast.jsx             # Notification system
-│   ├── pages/
-│   │   ├── Home.jsx              # Dashboard: SOS, stats, quick actions, emergency numbers
-│   │   ├── Report.jsx            # 3-step civic issue report form
-│   │   ├── MyReports.jsx         # User's reports with status timeline
-│   │   ├── SafetyFeed.jsx        # Anonymous safety incident feed
-│   │   ├── MapView.jsx           # Interactive crime/issues map
-│   │   ├── Profile.jsx           # User profile, emergency contacts, settings
-│   │   ├── SignUp.jsx            # Registration with address
-│   │   ├── CommunityLeaders.jsx  # Directory of ward councillors, CPF, safety forums
-│   │   ├── AdminDashboard.jsx    # Municipality admin panel
-│   │   ├── PatrolMode.jsx        # Neighborhood watch toolkit
-│   │   └── USSDBot.jsx           # USSD/SMS bot simulator
-│   ├── hooks/
-│   │   ├── useAuth.jsx           # Pseudonymous authentication
-│   │   └── useNetwork.js         # Online/offline detection
+│   │   ├── BottomNav.jsx         # 6-tab bottom navigation
+│   │   ├── BusinessSignup.jsx    # 2-step business registration
+│   │   ├── ChildTracker.jsx      # Live school transport map
+│   │   ├── CopyrightFooter.jsx   # Footer with POPIA notice
+│   │   ├── DisasterMap.jsx       # Disaster damage map
+│   │   ├── DisasterWidget.jsx    # Home screen warning widget
+│   │   ├── ESPWidget.jsx         # Load shedding schedule widget
+│   │   ├── ErrorBoundary.jsx     # React error boundary
+│   │   ├── Layout.jsx            # Page layout wrapper
+│   │   ├── OfflineBanner.jsx     # Offline status banner
+│   │   ├── OutageMap.jsx         # Power outage map
+│   │   ├── PowerWidget.jsx       # Home screen power widget
+│   │   ├── PreparednessLibrary.jsx # Disaster preparedness guides
+│   │   ├── SOSButton.jsx         # Emergency SOS button
+│   │   ├── Toast.jsx             # Global toast notifications
+│   │   ├── TransportWidget.jsx   # Home screen transport widget
+│   │   └── VehicleCheck.jsx      # Vehicle permit lookup
 │   ├── db/
-│   │   ├── schema.sql            # Full PostgreSQL + PostGIS schema
-│   │   ├── mockApi.js            # Mock backend with seed data
-│   │   └── offline.js            # IndexedDB offline storage layer
+│   │   ├── disasterApi.js        # Disaster Shield API (13 functions)
+│   │   ├── mockApi.js            # Core civic API (21 functions)
+│   │   ├── offline.js            # IndexedDB stores (12 stores)
+│   │   ├── powerApi.js           # Power module API (9 functions)
+│   │   ├── schema.sql            # PostgreSQL schema (29 tables)
+│   │   ├── supabase.js           # Supabase client
+│   │   └── transportApi.js       # EduTrans API (12 functions)
+│   ├── hooks/
+│   │   ├── useAuth.jsx           # Pseudonymous auth context
+│   │   └── useNetwork.js         # Online/offline detection
+│   ├── pages/
+│   │   ├── AdminDashboard.jsx
+│   │   ├── CommunityLeaders.jsx
+│   │   ├── DisasterShieldScreen.jsx
+│   │   ├── EduTransScreen.jsx
+│   │   ├── Home.jsx
+│   │   ├── MapView.jsx
+│   │   ├── MyReports.jsx
+│   │   ├── PatrolMode.jsx
+│   │   ├── PowerScreen.jsx
+│   │   ├── Profile.jsx
+│   │   ├── Report.jsx
+│   │   ├── SafetyFeed.jsx
+│   │   ├── SignUp.jsx
+│   │   └── USSDBot.jsx
 │   ├── utils/
-│   │   ├── geolocation.js        # Location services and privacy fuzzing
-│   │   ├── encryption.js         # Web Crypto encryption utilities
-│   │   └── helpers.js            # Shared constants, formatters, utilities
-│   ├── App.jsx                   # Root component with routing and sync
-│   ├── main.jsx                  # Entry point
-│   └── index.css                 # Tailwind CSS with custom components
-├── LICENSE                       # MIT License (c) 2026 Pardon Mahara
-├── README.md                     # This file
-├── package.json
+│   │   ├── encryption.js         # Web Crypto encryption
+│   │   ├── geolocation.js        # GPS + Nominatim geocoding
+│   │   ├── helpers.js            # Constants + utilities
+│   │   └── notifications.js      # Push notification management
+│   ├── App.jsx                   # Routes + providers
+│   └── main.jsx                  # Entry point
+├── supabase/
+│   └── functions/
+│       └── send-sms/             # Edge function for Africa's Talking
+├── .github/
+│   └── workflows/
+│       └── ci.yml                # GitHub Actions CI/CD
+├── .env.example
+├── .eslintrc.json
+├── vitest.config.js
 ├── vite.config.js
 ├── tailwind.config.js
-└── postcss.config.js
+├── postcss.config.js
+├── package.json
+├── LICENSE                       # MIT License (c) 2026 Pardon Mahara
+└── README.md                     # This file
 ```
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18 or later
-- npm (comes with Node.js)
-
-### Installation
-
-```bash
-# Clone the repository
-git clone <repository-url>
-cd mahikeng
-
-# Install dependencies
-npm install
-
-# Start the development server
-npm run dev
-```
-
-The app will be available at `http://localhost:3000`.
-
-### Build for Production
-
-```bash
-npm run build
-npm run preview
-```
-
-### Deploy
-
-```bash
-# Vercel
-npx vercel deploy dist/
-
-# Netlify
-npx netlify deploy --dir=dist --prod
-
-# Or serve with any static file server
-npx serve dist
-```
-
-The app must be served over HTTPS for PWA installation and service worker to function.
-
----
-
-## Features Walkthrough
-
-### Home Screen
-- Prominent SOS panic button (hold 3s or triple-tap)
-- Quick stats: total reports, resolution rate, active incidents
-- Quick actions: Report Issue, My Reports, Safety Feed, Crime Map, Community Leaders, Sign Up, SAPS 10111
-- Emergency numbers section with one-tap calling
-- Municipality Resolution Scorecard with category breakdown
-- Recent reports feed
-
-### Civic Issue Reporting
-- 3-step wizard: Category → Details → Submit
-- Categories: Pothole, Water Leak, Sewage, Streetlight, Electricity, Illegal Dumping, Housing, Other
-- Auto-detect GPS location with manual pin adjustment
-- Photo capture (up to 3 images, auto-compressed)
-- Urgency levels: Low, Normal, High, Critical
-- Offline save with auto-sync on reconnect
-- Draft system for incomplete reports
-
-### My Reports
-- Filter by status: All, Pending, Acknowledged, In Progress, Resolved
-- Expandable cards with status timeline
-- Municipality response notes visible
-- Report ID for reference
-
-### Safety Feed
-- Anonymous incident reporting (identity: "Community Member")
-- Incident types: Suspicious Activity, Theft, Vandalism, Break-in, Car Theft, Drug Activity, Noise
-- Confirm/Flag voting system for verification
-- Verified badge for community-confirmed incidents
-- Link to view incident on crime map
-
-### Crime Map
-- Interactive Leaflet map with OpenStreetMap tiles
-- Color-coded markers by category and incident type
-- Heatmap layer showing incident density hotspots
-- Filter: All, Infrastructure, Safety, Hotspots
-- Popup details on marker click
-- Location fuzzing for privacy on safety incidents
-
-### Community Leaders
-- Directory of ward councillors, CPF members, safety forum chairs, patrol leaders
-- Filter by category: Municipality, Police Forum, Safety Forum, Patrol Groups
-- Search by name, area, or ward
-- One-tap call and email buttons
-- SAPS emergency banner with 10111 and local station number
-
-### Sign Up
-- 3-step flow: Personal Details → Address → Emergency Contacts
-- Suburb selection: Central Mahikeng, Riviera Park, Montshiwa, Mmabatho, and more
-- Ward number selection
-- Street address and landmark
-- Emergency contacts (encrypted, stored locally only)
-- Skip option available
-
-### SOS Panic Button
-- Hold for 3 seconds OR triple-tap (discreet)
-- Gets GPS coordinates
-- Creates SOS alert in backend
-- Plays audible siren alarm (Web Audio API)
-- Vibrates device
-- Sends notification to emergency contacts
-- Simulates audio recording and streaming
-- Cancel button to deactivate
-
-### Patrol Mode
-- Join existing patrol groups or create new ones
-- Active Patrol: live location sharing with group
-- Group Chat: end-to-end encrypted messaging
-- Active patrollers list with last-seen timestamps
-- Registration Guide: step-by-step CPF registration process
-
-### USSD/SMS Bot
-- USSD Simulator: navigate menu with number keys (1-5)
-- SMS Bot: parse `#REPORT` and `#SOS` commands
-- Auto-categorization from keywords
-- SMS report history
-- Works without smartphone or data
-
-### Admin Dashboard
-- Overview: total reports, resolution rate, category performance, active alerts
-- Reports Management: acknowledge, mark in-progress, mark resolved, add response notes
-- Incident Moderation: remove harmful safety posts
-- Municipality Scorecard with resolution percentage by category
 
 ---
 
@@ -373,123 +428,64 @@ The app must be served over HTTPS for PWA installation and service worker to fun
 |---------|--------|-------|
 | SAPS Emergency | **10111** | National police emergency line |
 | Mahikeng SAPS Station | **018 381 8200** | Local police station |
-| Ambulance | **10177** | Medical emergencies |
-| Fire | **10177** | Fire emergencies |
+| Ambulance / Fire | **10177** | Medical & fire emergencies |
 | Municipality Hotline | **018 381 8200** | Service delivery issues |
+| North West PDMC | **066 030 8026** | Provincial Disaster Management |
+| SAWS | **012 367 6041** | South African Weather Service |
+| NW Transport | **018 388 4546** | Scholar transport |
+| NW Education | **018 388 2543** | Department of Education |
 
 All numbers are one-tap callable from the app.
 
 ---
 
-## Database Schema
+## Dependencies
 
-The full PostgreSQL schema is in `src/db/schema.sql`. It includes:
+**Runtime (8):** `@supabase/supabase-js`, `date-fns`, `idb`, `leaflet`, `react`, `react-dom`, `react-leaflet`, `react-router-dom`
 
-- **user_tokens** — Pseudonymous user identities (no personal data)
-- **civic_reports** — Infrastructure issue reports with PostGIS spatial indexing
-- **safety_incidents** — Community safety reports with confirmation/flag counts
-- **incident_confirmations** — Voting records for incident verification
-- **sos_alerts** — Emergency SOS events with location and status
-- **patrol_groups** — Neighborhood watch group definitions
-- **patrol_members** — Group membership with roles
-- **patrol_sessions** — Active patrol sessions
-- **patrol_locations** — Real-time location data during patrols
-- **patrol_messages** — Encrypted group chat messages
-- **sms_reports** — USSD/SMS submission records
-- **municipality_scorecard** — Materialized view for accountability metrics
-
-### Supabase Deployment
-
-1. Create a Supabase project at [supabase.com](https://supabase.com)
-2. Run the contents of `src/db/schema.sql` in the SQL editor
-3. Replace mock API calls in `src/db/mockApi.js` with the Supabase JavaScript client
-4. Row Level Security policies are included in the schema
-5. Enable PostGIS extension for spatial queries
-
----
-
-## USSD/SMS Testing
-
-### USSD Simulator
-
-Navigate to Profile → USSD/SMS Bot → USSD Simulator:
-
-| Key | Action |
-|-----|--------|
-| 1 | Report an Issue |
-| 2 | Check Report Status |
-| 3 | Emergency SOS |
-| 4 | Safety Alerts |
-| 5 | Help |
-| 0 | Back to previous menu |
-
-### SMS Bot
-
-Navigate to Profile → USSD/SMS Bot → SMS Bot:
-
-```
-#REPORT pothole at Station Road near Shoprite
-#REPORT water leak at 45 Church Street
-#REPORT sewage overflow at school on Buffalo Road
-#REPORT streetlight out on First Avenue
-#SOS
-```
-
-The bot auto-categorizes based on keywords and creates reports.
-
-### Production USSD Integration
-
-For real USSD/SMS integration:
-1. Register with [Africa's Talking](https://africastalking.com) or similar provider
-2. Set up a webhook endpoint to receive USSD sessions
-3. Map the `USSD_MENUS` structure to the provider's format
-4. Process SMS via the gateway's API
+**Dev (11):** `@testing-library/jest-dom`, `@testing-library/react`, `@vitejs/plugin-react`, `autoprefixer`, `jsdom`, `postcss`, `tailwindcss`, `vite`, `vite-plugin-pwa`, `vitest`, `workbox-window`
 
 ---
 
 ## Contributing
 
-This is an open-source project built for the Mahikeng community. Contributions are welcome.
-
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/my-feature`)
-3. Make your changes
-4. Test on mobile devices
-5. Submit a pull request
+3. Run tests (`npm test`)
+4. Commit with a descriptive message
+5. Push and create a Pull Request
+
+---
+
+## Acknowledgements
+
+- The residents of Mahikeng who deserve better service delivery and a safer community
+- Community safety forums and neighbourhood watch groups who self-organize to protect their neighbors
+- SAHRC for the scholar transport investigative report (January 2026)
+- Mahikeng Disaster Management Summit (October 2025) and the EW4All Roadmap
+- OpenStreetMap contributors for free, open map data
+- EskomSePush for load shedding data
+- AfriGIS and SAWS for weather warning data
+- Africa's Talking for SMS/USSD gateway
+- Supabase for open-source backend infrastructure
 
 ---
 
 ## License
 
-MIT License
+**Source-Available — All Rights Reserved**
 
 Copyright (c) 2026 Pardon Mahara
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This is **not open-source software**. The source code is made available for transparency and auditability, but all rights are reserved by the author.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+**You may:** Install, run, and deploy the Software for civic/community use. View and read the source code.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+**You may not:** Modify, redistribute, sell, sublicense, or create derivative works without explicit written permission from the author. Only Pardon Mahara has the right to modify and update this Software.
 
----
+For commercial licensing, modifications, or redistribution, contact the author.
 
-## Acknowledgments
-
-- The residents of Mahikeng who deserve better service delivery and a safer community
-- Community safety forums and neighborhood watch groups who self-organize to protect their neighbors
-- OpenStreetMap contributors for free, open map data
-- The fixlocal platform for demonstrating that communities want to self-organize
-- Every resident who has ever reported a pothole, a sewage spill, or a broken streetlight and wondered if anyone was listening
-
-**This app is for you. Your voice matters. Your safety matters. Mahikeng matters.**
+See [LICENSE](./LICENSE) for full terms.
 
 ---
 

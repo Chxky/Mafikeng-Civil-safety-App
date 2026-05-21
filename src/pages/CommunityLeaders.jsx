@@ -1,118 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-const LEADERS = [
-  {
-    id: 1,
-    name: 'Cllr. Kgomotso Mokgatlhe',
-    role: 'Ward Councillor',
-    ward: 'Ward 1 — Central Mahikeng',
-    phone: '018 381 8200',
-    email: 'kmokgatlhe@mahikeng.gov.za',
-    area: 'CBD, Station Road area',
-    available: 'Mon-Fri 8:00-16:30',
-    category: 'municipality',
-  },
-  {
-    id: 2,
-    name: 'Cllr. Thapelo Modise',
-    role: 'Ward Councillor',
-    ward: 'Ward 3 — Riviera Park',
-    phone: '018 381 8201',
-    email: 'tmodise@mahikeng.gov.za',
-    area: 'Riviera Park, Extension 1-4',
-    available: 'Mon-Fri 8:00-16:30',
-    category: 'municipality',
-  },
-  {
-    id: 3,
-    name: 'Cllr. Mmathapelo Tau',
-    role: 'Ward Councillor',
-    ward: 'Ward 5 — Montshiwa',
-    phone: '018 381 8202',
-    email: 'mtau@mahikeng.gov.za',
-    area: 'Montshiwa, Blikkiesdorp',
-    available: 'Mon-Fri 8:00-16:30',
-    category: 'municipality',
-  },
-  {
-    id: 4,
-    name: 'Cllr. Boitumelo Moiloa',
-    role: 'Ward Councillor',
-    ward: 'Ward 7 — Mmabatho',
-    phone: '018 381 8203',
-    email: 'bmoiloa@mahikeng.gov.za',
-    area: 'Mmabatho, Unit 1-7',
-    available: 'Mon-Fri 8:00-16:30',
-    category: 'municipality',
-  },
-  {
-    id: 5,
-    name: 'Mr. Patrick Molefe',
-    role: 'CPF Chairperson',
-    ward: 'Mahikeng Central CPF',
-    phone: '082 456 7890',
-    email: null,
-    area: 'Greater Mahikeng Central',
-    available: 'Available evenings',
-    category: 'cpf',
-  },
-  {
-    id: 6,
-    name: 'Mrs. Dorah Kganakga',
-    role: 'CPF Deputy Chair',
-    ward: 'Mahikeng Central CPF',
-    phone: '076 234 5678',
-    email: null,
-    area: 'Greater Mahikeng Central',
-    available: 'Available weekends',
-    category: 'cpf',
-  },
-  {
-    id: 7,
-    name: 'Mr. Johannes Mokoena',
-    role: 'Community Safety Forum Chair',
-    ward: 'Riviera Park Safety Forum',
-    phone: '083 678 9012',
-    email: null,
-    area: 'Riviera Park & Extensions',
-    available: 'Tue-Thu evenings',
-    category: 'safety_forum',
-  },
-  {
-    id: 8,
-    name: 'Mr. Thuso Mogwe',
-    role: 'Patrol Group Leader',
-    ward: 'Montshiwa Night Patrol',
-    phone: '079 876 5432',
-    email: null,
-    area: 'Montshiwa Township',
-    available: 'Night shifts 20:00-04:00',
-    category: 'patrol',
-  },
-  {
-    id: 9,
-    name: 'Mrs. Kelebogile Nkosi',
-    role: 'Community Development Worker',
-    ward: 'Ward 2',
-    phone: '018 381 8210',
-    email: 'knkosi@mahikeng.gov.za',
-    area: 'Ward 2 service delivery',
-    available: 'Mon-Fri 8:00-16:30',
-    category: 'municipality',
-  },
-  {
-    id: 10,
-    name: 'Mr. Tshepo Mabena',
-    role: 'Youth Safety Forum Lead',
-    ward: 'Mahikeng Youth Safety',
-    phone: '071 234 5678',
-    email: null,
-    area: 'Mahikeng-wide youth programs',
-    available: 'Sat 10:00-14:00',
-    category: 'safety_forum',
-  },
-];
+import { getCommunityLeaders } from '../db/mockApi';
 
 const CATEGORIES = {
   all: { label: 'All', icon: '👥' },
@@ -126,8 +14,17 @@ export default function CommunityLeaders() {
   const navigate = useNavigate();
   const [filter, setFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [leaders, setLeaders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const filtered = LEADERS.filter(leader => {
+  useEffect(() => {
+    getCommunityLeaders().then(({ data }) => {
+      setLeaders(data || []);
+      setLoading(false);
+    });
+  }, []);
+
+  const filtered = leaders.filter(leader => {
     const matchesCategory = filter === 'all' || leader.category === filter;
     const matchesSearch = !searchQuery ||
       leader.name.toLowerCase().includes(searchQuery.toLowerCase()) ||

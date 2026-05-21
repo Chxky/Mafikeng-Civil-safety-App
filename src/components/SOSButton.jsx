@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getCurrentPosition } from '../utils/geolocation';
 import { vibrate } from '../utils/helpers';
 import { createSOSAlert } from '../db/mockApi';
+import { supabase, isLive } from '../db/supabase';
 import { useAuth } from '../hooks/useAuth';
 
 export default function SOSButton({ size = 'large', className = '' }) {
@@ -139,16 +140,38 @@ export default function SOSButton({ size = 'large', className = '' }) {
     }
   }
 
-  function notifyEmergencyContacts(position) {
-    // Simulate SMS sending
-    console.log('[SOS] Emergency contacts notified with location:', position);
-    console.log('[SOS] SMS sent to emergency contacts');
-    console.log('[SOS] Alert forwarded to response network');
+  async function notifyEmergencyContacts(position) {
+    const locationUrl = `https://maps.google.com/?q=${position.lat},${position.lng}`;
+    const sosMessage = `SOS EMERGENCY from Mahikeng Civic Safety!\nLocation: ${locationUrl}\nTime: ${new Date().toLocaleString()}\nThis person needs immediate help.`;
 
-    // Simulate push notification to response network
+    // Try to get emergency contacts from IndexedDB
+    let contacts = [];
+    try {
+      const { getEmergencyContacts } = await import('../db/offline');
+      contacts = await getEmergencyContacts() || [];
+    } catch {}
+
+    // Send SMS via Supabase Edge Function (Africa's Talking)
+    if (isLive && contacts.length > 0) {
+      const phoneNumbers = contacts.map(c => c.phone).filter(Boolean);
+      if (phoneNumbers.length > 0) {
+        try {
+          await supabase.functions.invoke('send-sms', {
+            body: { to: phoneNumbers, message: sosMessage },
+          });
+          console.log('[SOS] SMS sent to', phoneNumbers.length, 'contacts');
+        } catch (err) {
+          console.error('[SOS] SMS failed:', err);
+        }
+      }
+    } else {
+      console.log('[SOS] No SMS gateway configured or no contacts. Location:', position);
+    }
+
+    // Send push notification to response network
     if ('Notification' in window && Notification.permission === 'granted') {
       new Notification('SOS Alert Sent', {
-        body: `Your emergency contacts and local security have been notified. Location: ${position.lat.toFixed(4)}, ${position.lng.toFixed(4)}`,
+        body: `Emergency contacts notified. Location: ${position.lat.toFixed(4)}, ${position.lng.toFixed(4)}`,
         icon: '/icons/icon-192.svg',
         tag: 'sos-alert',
       });

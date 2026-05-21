@@ -3,16 +3,17 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { getCivicReports, getSafetyIncidents } from '../db/mockApi';
+import { getDisasterReports } from '../db/disasterApi';
 import { getMahikengCenter, getMahikengBounds, fuzzLocation } from '../utils/geolocation';
 import { CATEGORIES, INCIDENT_TYPES, STATUSES, timeAgo } from '../utils/helpers';
 import 'leaflet/dist/leaflet.css';
 
-// Fix Leaflet default icon issue
+// Fix Leaflet default icon issue — use bundled assets
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+  iconRetinaUrl: new URL('leaflet/marker-icon-2x.png', import.meta.url).href,
+  iconUrl: new URL('leaflet/marker-icon.png', import.meta.url).href,
+  shadowUrl: new URL('leaflet/marker-shadow.png', import.meta.url).href,
 });
 
 // Custom marker icons
@@ -70,6 +71,7 @@ export default function MapView() {
 
   const [reports, setReports] = useState([]);
   const [incidents, setIncidents] = useState([]);
+  const [disasterReports, setDisasterReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeLayer, setActiveLayer] = useState('all'); // 'all', 'reports', 'incidents', 'heatmap'
   const [selectedItem, setSelectedItem] = useState(null);
@@ -84,12 +86,14 @@ export default function MapView() {
 
   async function loadData() {
     try {
-      const [reportsRes, incidentsRes] = await Promise.all([
+      const [reportsRes, incidentsRes, disasterRes] = await Promise.all([
         getCivicReports(),
         getSafetyIncidents(),
+        getDisasterReports(),
       ]);
       setReports(reportsRes.data || []);
       setIncidents(incidentsRes.data || []);
+      setDisasterReports(disasterRes.data || []);
     } catch (err) {
       console.error('Failed to load map data:', err);
     } finally {
@@ -140,6 +144,8 @@ export default function MapView() {
             { key: 'reports', label: 'Infrastructure', icon: '🏗️' },
             { key: 'incidents', label: 'Safety', icon: '🛡️' },
             { key: 'heatmap', label: 'Hotspots', icon: '🔥' },
+            { key: 'outages', label: 'Outages', icon: '⚡' },
+            { key: 'disaster', label: 'Disaster', icon: '🌊' },
           ].map(layer => (
             <button
               key={layer.key}
@@ -271,6 +277,68 @@ export default function MapView() {
                   </Popup>
                 </Circle>
               ))}
+
+            {/* Outage Markers */}
+            {(activeLayer === 'outages') &&
+              reports.filter(r => r.category === 'electricity').map(report => {
+                const outageColor = report.outage_type === 'unscheduled' ? '#ef4444'
+                  : report.outage_type === 'scheduled' ? '#f97316' : '#eab308';
+                const cat = CATEGORIES[report.category];
+
+                return (
+                  <Marker
+                    key={`outage-${report.id}`}
+                    position={[report.latitude, report.longitude]}
+                    icon={createIcon(outageColor, 28)}
+                  >
+                    <Popup>
+                      <div className="min-w-[200px]">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span>⚡</span>
+                          <span className="font-semibold text-sm capitalize">
+                            {report.outage_type || 'Unknown'} Outage
+                          </span>
+                        </div>
+                        <h3 className="font-medium text-sm mb-1">{report.title}</h3>
+                        <p className="text-xs text-gray-500 mb-2">{report.address}</p>
+                        <div className="flex items-center gap-2">
+                          <span className={`badge ${(STATUSES[report.status] || STATUSES.pending).bg} ${(STATUSES[report.status] || STATUSES.pending).color}`}>
+                            {(STATUSES[report.status] || STATUSES.pending).label}
+                          </span>
+                          <span className="text-xs text-gray-400">{timeAgo(report.created_at)}</span>
+                        </div>
+                      </div>
+                    </Popup>
+                  </Marker>
+                );
+              })}
+
+            {/* Disaster Reports Markers */}
+            {(activeLayer === 'all' || activeLayer === 'disaster') &&
+              disasterReports.map(report => {
+                const DISASTER_COLORS = { flood: '#3b82f6', veld_fire: '#ef4444', storm_damage: '#f97316', structural_collapse: '#8b5cf6', other: '#6b7280' };
+                const DISASTER_ICONS = { flood: '🌊', veld_fire: '🔥', storm_damage: '🌪️', structural_collapse: '🏚️', other: '⚠️' };
+                const color = DISASTER_COLORS[report.disaster_type] || '#6b7280';
+                const icon = DISASTER_ICONS[report.disaster_type] || '⚠️';
+                return (
+                  <Marker key={`disaster-${report.id}`} position={[report.latitude, report.longitude]}
+                    icon={L.divIcon({ className: '', html: `<div style="width:28px;height:28px;background:${color};border:3px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;font-size:14px">${icon}</div>`, iconSize: [28, 28], iconAnchor: [14, 14] })}>
+                    <Popup>
+                      <div className="min-w-[180px]">
+                        <p className="font-bold text-sm">{icon} {report.disaster_type.replace(/_/g, ' ')}</p>
+                        <p className="text-xs text-gray-600 mt-1">{report.description}</p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <span className={`badge text-xs ${report.urgency_level === 'immediate_threat' ? 'bg-danger-100 text-danger-700' : 'bg-gray-100 text-gray-600'}`}>
+                            {report.urgency_level === 'immediate_threat' ? '🚨 Immediate' : 'Damage'}
+                          </span>
+                          <span className="text-xs text-gray-400">{timeAgo(report.created_at)}</span>
+                        </div>
+                        {report.needs_evacuation && <p className="text-xs text-danger-600 font-medium mt-1">⚠ Evacuation needed</p>}
+                      </div>
+                    </Popup>
+                  </Marker>
+                );
+              })}
           </MapContainer>
         )}
 
@@ -283,6 +351,28 @@ export default function MapView() {
                 <div className="w-3 h-3 rounded-full bg-danger-500 opacity-50"></div>
                 <span className="text-xs text-gray-600">Incident hotspot</span>
               </div>
+            ) : activeLayer === 'disaster' ? (
+              <>
+                <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{ background: '#3b82f6' }}></div><span className="text-xs text-gray-600">Flood</span></div>
+                <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{ background: '#ef4444' }}></div><span className="text-xs text-gray-600">Veld Fire</span></div>
+                <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{ background: '#f97316' }}></div><span className="text-xs text-gray-600">Storm</span></div>
+                <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{ background: '#8b5cf6' }}></div><span className="text-xs text-gray-600">Collapse</span></div>
+              </>
+            ) : activeLayer === 'outages' ? (
+              <>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full" style={{ background: '#ef4444' }}></div>
+                  <span className="text-xs text-gray-600">Unscheduled fault</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full" style={{ background: '#f97316' }}></div>
+                  <span className="text-xs text-gray-600">Load shedding</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full" style={{ background: '#eab308' }}></div>
+                  <span className="text-xs text-gray-600">Unknown</span>
+                </div>
+              </>
             ) : (
               <>
                 {Object.entries(CATEGORY_COLORS).slice(0, 4).map(([key, color]) => (

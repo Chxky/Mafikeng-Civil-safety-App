@@ -3,72 +3,51 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { getCurrentPosition, watchPosition, clearWatch } from '../utils/geolocation';
 import { showToast, timeAgo } from '../utils/helpers';
-
-// Simulated patrol group data
-const MOCK_PATROL_GROUPS = [
-  {
-    id: '1',
-    name: 'Mahikeng Central Patrol',
-    area: 'Central Business District',
-    members: 12,
-    activePatrollers: 3,
-    is_active: true,
-  },
-  {
-    id: '2',
-    name: 'Riviera Park Watch',
-    area: 'Riviera Park Extension',
-    members: 8,
-    activePatrollers: 0,
-    is_active: true,
-  },
-  {
-    id: '3',
-    name: 'Montshiwa Safety Forum',
-    area: 'Montshiwa Township',
-    members: 15,
-    activePatrollers: 5,
-    is_active: true,
-  },
-];
-
-// Simulated chat messages
-const MOCK_MESSAGES = [
-  { id: 1, user: 'Eagle Eye', message: 'All clear on Station Road', time: '2 min ago', type: 'text' },
-  { id: 2, user: 'Swift Guardian', message: 'Suspicious vehicle near church parking', time: '5 min ago', type: 'alert' },
-  { id: 3, user: 'Brave Sentinel', message: 'Heading to First Avenue now', time: '8 min ago', type: 'text' },
-  { id: 4, user: 'Watchful Keeper', message: 'Streetlight out on Buffalo Road - noted for report', time: '12 min ago', type: 'text' },
-  { id: 5, user: 'Eagle Eye', message: 'Meeting point at community hall at 20:00', time: '15 min ago', type: 'text' },
-];
-
-// Simulated patroller locations
-const MOCK_PATROLLERS = [
-  { id: 1, name: 'Eagle Eye', lat: -25.8650, lng: 25.6440, lastSeen: '1 min ago' },
-  { id: 2, name: 'Swift Guardian', lat: -25.8660, lng: 25.6450, lastSeen: '2 min ago' },
-  { id: 3, name: 'Brave Sentinel', lat: -25.8640, lng: 25.6430, lastSeen: 'Just now' },
-];
+import { getPatrolGroups, getPatrolMessages, sendPatrolMessage, getActivePatrollers } from '../db/mockApi';
+import { supabase, isLive } from '../db/supabase';
 
 export default function PatrolMode() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const [activeView, setActiveView] = useState('groups'); // 'groups', 'active', 'chat'
-  const [groups, setGroups] = useState(MOCK_PATROL_GROUPS);
+  const [activeView, setActiveView] = useState('groups');
+  const [groups, setGroups] = useState([]);
   const [activePatrol, setActivePatrol] = useState(null);
   const [isPatrolling, setIsPatrolling] = useState(false);
   const [myLocation, setMyLocation] = useState(null);
-  const [patrollers, setPatrollers] = useState(MOCK_PATROLLERS);
-  const [messages, setMessages] = useState(MOCK_MESSAGES);
+  const [patrollers, setPatrollers] = useState([]);
+  const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [showRegistrationGuide, setShowRegistrationGuide] = useState(false);
+  const [loading, setLoading] = useState(true);
   const watchIdRef = useRef(null);
   const chatEndRef = useRef(null);
+  const realtimeChannelRef = useRef(null);
+
+  useEffect(() => {
+    loadGroups();
+  }, []);
+
+  async function loadGroups() {
+    setLoading(true);
+    const { data } = await getPatrolGroups();
+    setGroups(data || []);
+    setLoading(false);
+  }
 
   // Start patrol
-  const startPatrol = useCallback((group) => {
+  const startPatrol = useCallback(async (group) => {
     setActivePatrol(group);
     setIsPatrolling(true);
     setActiveView('active');
+
+    // Load chat messages and active patrollers
+    const [msgResult, patResult] = await Promise.all([
+      getPatrolMessages(group.id),
+      getActivePatrollers(group.id),
+    ]);
+    setMessages(msgResult.data || []);
+    setPatrollers(patResult.data || []);
 
     // Start location tracking
     watchIdRef.current = watchPosition(
@@ -76,6 +55,33 @@ export default function PatrolMode() {
       (err) => console.error('Location watch error:', err),
       { enableHighAccuracy: true }
     );
+
+    // Subscribe to real-time messages
+    if (isLive && supabase) {
+      realtimeChannelRef.current = supabase
+        .channel(`patrol-chat-${group.id}`)
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'patrol_messages',
+          filter: `group_id=eq.${group.id}`,
+        }, (payload) => {
+          const newMsg = payload.new;
+          setMessages(prev => {
+            // Deduplicate
+            if (prev.some(m => m.id === newMsg.id)) return prev;
+            return [...prev, {
+              id: newMsg.id,
+              user: newMsg.display_name || 'Patroller',
+              message: newMsg.message,
+              created_at: newMsg.created_at,
+              type: newMsg.message_type || 'text',
+            }];
+          });
+          setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+        })
+        .subscribe();
+    }
 
     showToast?.('Patrol started. Your location is being shared with the group.', 'success');
   }, []);
@@ -86,6 +92,10 @@ export default function PatrolMode() {
       clearWatch(watchIdRef.current);
       watchIdRef.current = null;
     }
+    if (realtimeChannelRef.current) {
+      supabase.removeChannel(realtimeChannelRef.current);
+      realtimeChannelRef.current = null;
+    }
     setIsPatrolling(false);
     setActivePatrol(null);
     setActiveView('groups');
@@ -93,31 +103,40 @@ export default function PatrolMode() {
   }, []);
 
   // Send message
-  function sendMessage() {
+  async function sendMessage() {
     if (!newMessage.trim()) return;
 
-    const msg = {
-      id: Date.now(),
-      user: user?.displayName || 'You',
-      message: newMessage.trim(),
-      time: 'Just now',
-      type: 'text',
-    };
-
-    setMessages(prev => [...prev, msg]);
+    const msg = newMessage.trim();
     setNewMessage('');
 
-    // Scroll to bottom
-    setTimeout(() => {
-      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
+    // Optimistic add
+    const tempId = Date.now();
+    const tempMsg = {
+      id: tempId,
+      user: user?.displayName || 'You',
+      message: msg,
+      created_at: new Date().toISOString(),
+      type: 'text',
+    };
+    setMessages(prev => [...prev, tempMsg]);
+    setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+
+    // Send to API — rollback on failure
+    if (activePatrol) {
+      const { error } = await sendPatrolMessage(activePatrol.id, user?.id, msg);
+      if (error) {
+        setMessages(prev => prev.filter(m => m.id !== tempId));
+        showToast?.('Failed to send message', 'error');
+      }
+    }
   }
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (watchIdRef.current) {
-        clearWatch(watchIdRef.current);
+      if (watchIdRef.current) clearWatch(watchIdRef.current);
+      if (realtimeChannelRef.current && supabase) {
+        supabase.removeChannel(realtimeChannelRef.current);
       }
     };
   }, []);
@@ -180,34 +199,41 @@ export default function PatrolMode() {
             </button>
           </div>
 
-          <div className="space-y-3">
-            {groups.map(group => (
-              <div key={group.id} className="card">
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <h3 className="font-semibold text-sm">{group.name}</h3>
-                    <p className="text-xs text-gray-500">{group.area}</p>
+          {loading ? (
+            <div className="card text-center py-12">
+              <div className="w-8 h-8 border-2 border-safety-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+              <p className="text-sm text-gray-500">Loading groups...</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {groups.map(group => (
+                <div key={group.id} className="card">
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <h3 className="font-semibold text-sm">{group.name}</h3>
+                      <p className="text-xs text-gray-500">{group.area}</p>
+                    </div>
+                    {group.activePatrollers > 0 && (
+                      <span className="badge bg-safety-100 text-safety-700">
+                        🟢 {group.activePatrollers} patrolling
+                      </span>
+                    )}
                   </div>
-                  {group.activePatrollers > 0 && (
-                    <span className="badge bg-safety-100 text-safety-700">
-                      🟢 {group.activePatrollers} patrolling
-                    </span>
-                  )}
-                </div>
 
-                <div className="flex items-center gap-4 text-xs text-gray-500 mb-3">
-                  <span>{group.members} members</span>
-                </div>
+                  <div className="flex items-center gap-4 text-xs text-gray-500 mb-3">
+                    <span>{group.members} members</span>
+                  </div>
 
-                <button
-                  onClick={() => startPatrol(group)}
-                  className="btn-safety w-full text-sm py-2"
-                >
-                  Start Patrol
-                </button>
-              </div>
-            ))}
-          </div>
+                  <button
+                    onClick={() => startPatrol(group)}
+                    className="btn-safety w-full text-sm py-2"
+                  >
+                    Start Patrol
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Registration Guide */}
           {showRegistrationGuide && (
@@ -356,7 +382,7 @@ export default function PatrolMode() {
                       <p className="text-sm">{msg.message}</p>
                     </div>
                     <p className={`text-xs text-gray-400 mt-1 ${isMe ? 'text-right' : ''}`}>
-                      {msg.time}
+                      {timeAgo(msg.created_at)}
                     </p>
                   </div>
                 </div>
