@@ -1,10 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+// eslint-disable-next-line no-unused-vars
 import { getCurrentPosition, watchPosition, clearWatch } from '../utils/geolocation';
 import { showToast, timeAgo } from '../utils/helpers';
 import { getPatrolGroups, getPatrolMessages, sendPatrolMessage, getActivePatrollers } from '../db/mockApi';
 import { supabase, isLive } from '../db/supabase';
+import { encryptMessage, decryptMessage, generateEncryptionKey, exportKey, importKey } from '../utils/encryption';
+import Icon from '../components/Icon';
 
 export default function PatrolMode() {
   const { user } = useAuth();
@@ -46,7 +49,20 @@ export default function PatrolMode() {
       getPatrolMessages(group.id),
       getActivePatrollers(group.id),
     ]);
-    setMessages(msgResult.data || []);
+    const key = await getOrCreateGroupKey(group.id);
+    setGroupKey(key);
+    const decryptedMessages = await Promise.all(
+      (msgResult.data || []).map(async (msg) => {
+        try {
+          if (msg.encrypted_content) {
+            const decrypted = await decryptMessage(msg.encrypted_content, key);
+            return { ...msg, message: decrypted };
+          }
+        } catch { /* fall through */ }
+        return msg;
+      })
+    );
+    setMessages(decryptedMessages);
     setPatrollers(patResult.data || []);
 
     // Start location tracking
@@ -65,18 +81,17 @@ export default function PatrolMode() {
           schema: 'public',
           table: 'patrol_messages',
           filter: `group_id=eq.${group.id}`,
-        }, (payload) => {
+        }, async (payload) => {
           const newMsg = payload.new;
           setMessages(prev => {
-            // Deduplicate
             if (prev.some(m => m.id === newMsg.id)) return prev;
-            return [...prev, {
-              id: newMsg.id,
-              user: newMsg.display_name || 'Patroller',
-              message: newMsg.message,
-              created_at: newMsg.created_at,
-              type: newMsg.message_type || 'text',
-            }];
+            return prev;
+          });
+          // Decrypt and add
+          const decrypted = await decryptAndAddMessage(newMsg);
+          setMessages(prev => {
+            if (prev.some(m => m.id === decrypted.id)) return prev;
+            return [...prev, decrypted];
           });
           setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
         })
@@ -84,6 +99,7 @@ export default function PatrolMode() {
     }
 
     showToast?.('Patrol started. Your location is being shared with the group.', 'success');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Stop patrol
@@ -102,32 +118,77 @@ export default function PatrolMode() {
     showToast?.('Patrol ended.', 'info');
   }, []);
 
-  // Send message
-  async function sendMessage() {
-    if (!newMessage.trim()) return;
+  // Send message — now E2E encrypted
+  async function sendMessage() { return sendEncryptedMessage(); }
+
+  // E2E Encryption for patrol chat
+  const [groupKey, setGroupKey] = useState(null);
+
+  async function getOrCreateGroupKey(groupId) {
+    const stored = localStorage.getItem(`patrol-key-${groupId}`);
+    if (stored) {
+      try { return await importKey(stored); } catch { /* fall through */ }
+    }
+    const key = await generateEncryptionKey();
+    const exported = await exportKey(key);
+    localStorage.setItem(`patrol-key-${groupId}`, exported);
+    return key;
+  }
+
+  // Encrypt and send message with E2E
+  async function sendEncryptedMessage() {
+    if (!newMessage.trim() || !activePatrol) return;
 
     const msg = newMessage.trim();
     setNewMessage('');
 
-    // Optimistic add
+    // Encrypt the message
+    const key = groupKey || await getOrCreateGroupKey(activePatrol.id);
+    if (!groupKey) setGroupKey(key);
+    const encrypted = await encryptMessage(msg, key);
+
     const tempId = Date.now();
     const tempMsg = {
       id: tempId,
       user: user?.displayName || 'You',
       message: msg,
+      encrypted_content: encrypted,
       created_at: new Date().toISOString(),
       type: 'text',
     };
     setMessages(prev => [...prev, tempMsg]);
     setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
 
-    // Send to API — rollback on failure
-    if (activePatrol) {
-      const { error } = await sendPatrolMessage(activePatrol.id, user?.id, msg);
-      if (error) {
-        setMessages(prev => prev.filter(m => m.id !== tempId));
-        showToast?.('Failed to send message', 'error');
-      }
+    const { error } = await sendPatrolMessage(activePatrol.id, user?.id, msg, encrypted);
+    if (error) {
+      setMessages(prev => prev.filter(m => m.id !== tempId));
+      showToast?.('Failed to send message', 'error');
+    }
+  }
+
+  // Decrypt incoming messages
+  async function decryptAndAddMessage(raw) {
+    try {
+      const key = groupKey || await getOrCreateGroupKey(activePatrol.id);
+      if (!groupKey) setGroupKey(key);
+      const decrypted = raw.encrypted_content
+        ? await decryptMessage(raw.encrypted_content, key)
+        : raw.message;
+      return {
+        id: raw.id,
+        user: raw.display_name || 'Patroller',
+        message: decrypted,
+        created_at: raw.created_at,
+        type: raw.message_type || 'text',
+      };
+    } catch {
+      return {
+        id: raw.id,
+        user: raw.display_name || 'Patroller',
+        message: '🔒 Encrypted message',
+        created_at: raw.created_at,
+        type: raw.message_type || 'text',
+      };
     }
   }
 
@@ -156,9 +217,7 @@ export default function PatrolMode() {
       <div className="bg-white border-b border-gray-100 px-4 py-4 sticky top-0 z-30">
         <div className="flex items-center gap-3 mb-3">
           <button onClick={() => navigate(-1)} className="p-1">
-            <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-            </svg>
+            <Icon name="arrowLeft" className="w-6 h-6 text-gray-600" />
           </button>
           <h1 className="text-lg font-bold">Patrol Mode</h1>
           {isPatrolling && (
@@ -243,9 +302,7 @@ export default function PatrolMode() {
                   <div className="flex items-center justify-between">
                     <h2 className="text-lg font-bold">Register a Patrol Group</h2>
                     <button onClick={() => setShowRegistrationGuide(false)} className="p-2">
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
+                      <Icon name="close" className="w-5 h-5" />
                     </button>
                   </div>
                   <p className="text-xs text-gray-500 mt-1">Follow these steps to officially register</p>
@@ -285,9 +342,7 @@ export default function PatrolMode() {
         <div className="px-4 py-4">
           {!isPatrolling ? (
             <div className="card text-center py-12">
-              <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
-              </svg>
+              <Icon name="users" className="w-16 h-16 text-gray-300 mx-auto mb-4" strokeWidth={1} />
               <p className="text-gray-400 font-medium">No active patrol</p>
               <p className="text-sm text-gray-400 mt-1">Join a group to start patrolling</p>
             </div>
@@ -354,9 +409,7 @@ export default function PatrolMode() {
           {/* Encryption notice */}
           <div className="px-4 py-2 bg-civic-50 border-b border-civic-100">
             <div className="flex items-center gap-2">
-              <svg className="w-4 h-4 text-civic-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-              </svg>
+              <Icon name="lock" className="w-4 h-4 text-civic-600" />
               <span className="text-xs text-civic-600 font-medium">End-to-end encrypted group chat</span>
             </div>
           </div>
@@ -406,9 +459,7 @@ export default function PatrolMode() {
                 onClick={sendMessage}
                 className="btn-safety px-4"
               >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-                </svg>
+                <Icon name="send" className="w-5 h-5" />
               </button>
             </div>
           </div>

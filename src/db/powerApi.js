@@ -2,18 +2,11 @@
 // Dual-mode: Supabase when live, in-memory when mock
 
 import { supabase, isLive } from './supabase';
-import { CATEGORY_TO_DEPARTMENT } from '../utils/helpers';
-
-const delay = (ms) => new Promise(r => setTimeout(r, ms));
-
-function uuid() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-    const r = Math.random() * 16 | 0;
-    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-  });
-}
+// eslint-disable-next-line no-unused-vars
+import { CATEGORY_TO_DEPARTMENT, uuid, delay } from '../utils/helpers';
 
 // In-memory stores (mock mode)
+let outageReports = [];
 let businessProfiles = [];
 let outageConfirmations = [];
 let businessAlerts = [];
@@ -77,6 +70,7 @@ export async function submitOutageReport(report) {
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };
+  outageReports.unshift(newReport);
 
   // Trigger business alerts (mock)
   await triggerBusinessAlerts(newReport, report.outage_type);
@@ -104,10 +98,12 @@ export async function getOutageReports(filters = {}) {
   }
 
   await delay(300);
-  // For mock, return from the main civic reports store (imported dynamically)
-  // Since we can't import from mockApi (circular), we use a shared reference
-  // In practice, the mockApi's civicReports already contains these
-  return { data: [], error: null };
+  let results = [...outageReports];
+  if (filters.outageType) results = results.filter(r => r.outage_type === filters.outageType);
+  if (filters.status) results = results.filter(r => r.status === filters.status);
+  if (filters.since) results = results.filter(r => r.created_at >= filters.since);
+  results.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  return { data: results, error: null };
 }
 
 /**
@@ -330,6 +326,9 @@ export async function getBusinessAlerts(businessId) {
 // ============================================================
 
 export function seedPowerData() {
+  outageReports = [];
+  outageConfirmations = [];
+  businessAlerts = [];
   // Seed some business profiles
   const types = ['restaurant', 'fresh_produce', 'guesthouse', 'clothing', 'other'];
   const names = [

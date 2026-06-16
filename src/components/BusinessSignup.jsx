@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { createBusinessProfile } from '../db/powerApi';
 import { getCurrentPosition, reverseGeocode } from '../utils/geolocation';
 import { showToast } from '../utils/helpers';
+import Icon from './Icon';
 
 const BUSINESS_TYPES = [
   { key: 'restaurant', label: 'Restaurant / Food', icon: '🍽️' },
@@ -75,9 +76,7 @@ export default function BusinessSignup({ userId, onComplete, onClose }) {
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold">Register Business</h2>
             <button onClick={onClose} className="p-2">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <Icon name="close" className="w-5 h-5" />
             </button>
           </div>
           {/* Progress */}
@@ -200,8 +199,7 @@ export default function BusinessSignup({ userId, onComplete, onClose }) {
             </div>
 
             <div className="card bg-gray-50">
-              <p className="text-xs text-gray-500">
-                You'll receive push notifications and SMS when power outages are reported
+              <p className="text-xs text-gray-500">                You&apos;ll receive push notifications and SMS when power outages are reported
                 within {alertRadius}km of your business. Alerts include outage type and suggested actions.
               </p>
             </div>

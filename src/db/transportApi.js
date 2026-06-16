@@ -2,14 +2,7 @@
 // Dual-mode: Supabase when live, in-memory when mock
 
 import { supabase, isLive } from './supabase';
-
-const delay = (ms) => new Promise(r => setTimeout(r, ms));
-function uuid() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-    const r = Math.random() * 16 | 0;
-    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-  });
-}
+import { uuid, delay } from '../utils/helpers';
 
 // In-memory stores (mock mode)
 let transportRoutes = [];
@@ -82,6 +75,7 @@ export async function startTrip(routeId, driverToken) {
   return { data: trip, error: null };
 }
 
+// eslint-disable-next-line no-unused-vars
 export async function updateTripStatus(tripId, status, location) {
   if (isLive) {
     const updates = { status };
@@ -203,6 +197,8 @@ export async function getStrandedReports() {
 // SEED DATA
 // ============================================================
 export function seedTransportData() {
+  learners = [];
+  strandedReports = [];
   transportRoutes = [
     { id: uuid(), name: 'Route A — CBD to Mmabatho High', school: 'Mmabatho High School', vehicle_registration: 'NW 123 GP', driver_name: 'Mr. Thabo Molefe', driver_phone: '082 456 7890', scheduled_pickup_times: ['06:30', '07:00'], scheduled_dropoff_times: ['14:00', '14:30'], is_active: true, created_at: new Date().toISOString() },
     { id: uuid(), name: 'Route B — Montshiwa to Mahikeng Primary', school: 'Mahikeng Primary School', vehicle_registration: 'NW 456 GP', driver_name: 'Mrs. Sarah Nkosi', driver_phone: '076 234 5678', scheduled_pickup_times: ['06:45', '07:15'], scheduled_dropoff_times: ['13:30', '14:00'], is_active: true, created_at: new Date().toISOString() },

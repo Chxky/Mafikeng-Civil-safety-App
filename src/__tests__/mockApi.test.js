@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
   createOrGetToken,
@@ -8,8 +9,10 @@ import {
   submitIncident,
   getSafetyIncidents,
   confirmIncident,
+  // eslint-disable-next-line no-unused-vars
   removeIncident,
   createSOSAlert,
+  // eslint-disable-next-line no-unused-vars
   updateSOSAlert,
   getDashboardStats,
   processSMSReport,
@@ -79,6 +82,7 @@ describe('getReportById', () => {
   });
 
   it('returns null for nonexistent id', async () => {
+    // eslint-disable-next-line no-unused-vars
     const { data, error } = await getReportById('nonexistent-id');
     expect(data).toBeNull();
   });

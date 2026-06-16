@@ -2,16 +2,7 @@
 // All function signatures are identical regardless of backend
 
 import { supabase, isLive } from './supabase';
-import { CATEGORY_TO_DEPARTMENT } from '../utils/helpers';
-
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-function uuid() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-    const r = Math.random() * 16 | 0;
-    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-  });
-}
+import { CATEGORY_TO_DEPARTMENT, uuid, delay } from '../utils/helpers';
 
 // ============================================================
 // IN-MEMORY STORES (mock mode only)
@@ -169,7 +160,7 @@ export async function createOrGetToken(token) {
       display_name: 'Community Member',
       created_at: new Date().toISOString(),
       last_active_at: new Date().toISOString(),
-      is_moderator: false,
+      is_moderator: userTokens.length === 0, // First user is moderator in demo mode
       is_patrol_member: false,
       emergency_contacts: [],
     };
@@ -850,16 +841,20 @@ export async function getPatrolMessages(groupId) {
   };
 }
 
-export async function sendPatrolMessage(groupId, userId, message) {
+export async function sendPatrolMessage(groupId, userId, message, encryptedContent = null) {
   if (isLive) {
+    const payload = {
+      group_id: groupId,
+      user_token_id: userId,
+      message: '🔒 End-to-end encrypted',
+      message_type: 'text',
+    };
+    if (encryptedContent) {
+      payload.encrypted_content = encryptedContent;
+    }
     const { data, error } = await supabase
       .from('patrol_messages')
-      .insert({
-        group_id: groupId,
-        user_token_id: userId,
-        message,
-        message_type: 'text',
-      })
+      .insert(payload)
       .select()
       .single();
 
@@ -871,7 +866,8 @@ export async function sendPatrolMessage(groupId, userId, message) {
     data: {
       id: Date.now(),
       user: 'You',
-      message,
+      message: encryptedContent ? '🔒 End-to-end encrypted' : message,
+      encrypted_content: encryptedContent,
       created_at: new Date().toISOString(),
       type: 'text',
     },

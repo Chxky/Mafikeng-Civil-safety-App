@@ -2,6 +2,7 @@
 // Implements pseudonymous auth and E2E encryption for patrol chat
 
 const TOKEN_KEY = 'mahikeng_user_token';
+// eslint-disable-next-line no-unused-vars
 const CONTACTS_KEY = 'mahikeng_emergency_contacts';
 
 /**

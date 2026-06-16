@@ -1,8 +1,12 @@
+import { useLanguage } from '../hooks/useLanguage';
+
 export default function OfflineBanner() {
+  const { t } = useLanguage();
+
   return (
-    <div className="offline-banner">
+    <div className="offline-banner dark:bg-warning-700">
       <span className="mr-2">📡</span>
-      You're offline — reports will sync when connection returns
+      {t('you_are_offline')} — {t('offline_message')}
     </div>
   );
 }

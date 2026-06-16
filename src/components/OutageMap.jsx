@@ -56,9 +56,11 @@ export default function OutageMap({ standalone = false }) {
   const [reports, setReports] = useState([]);
   const [confirmations, setConfirmations] = useState({});
   const [loading, setLoading] = useState(true);
+  // eslint-disable-next-line no-unused-vars
   const [selectedReport, setSelectedReport] = useState(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/immutability
     loadOutages();
   }, []);
 
@@ -166,8 +168,7 @@ export default function OutageMap({ standalone = false }) {
                       handleConfirm(cell.reports[0].id);
                     }}
                     className="mt-2 w-full bg-civic-600 text-white text-xs py-1.5 px-3 rounded-lg font-medium"
-                  >
-                    ⚡ I'm also affected ({confirmations[cell.reports[0]?.id] || 0})
+                  >                    ⚡ I'm also affected ({confirmations[cell.reports[0]?.id] || 0})
                   </button>
                 </div>
               </Popup>

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { processSMSReport, getSMSReports } from '../db/mockApi';
 import { showToast, timeAgo } from '../utils/helpers';
+import Icon from '../components/Icon';
 
 // USSD Menu Structure
 const USSD_MENUS = {
@@ -105,6 +106,7 @@ export default function USSDBot() {
   const [ussdInput, setUssdInput] = useState('');
   const [smsInput, setSmsInput] = useState('');
   const [smsHistory, setSmsHistory] = useState([]);
+  // eslint-disable-next-line no-unused-vars
   const [pendingCategory, setPendingCategory] = useState(null);
   const [smsReports, setSmsReports] = useState([]);
   const chatEndRef = useRef(null);
@@ -112,6 +114,7 @@ export default function USSDBot() {
   useEffect(() => {
     loadSMSReports();
     // Show initial menu
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setUssdHistory([{ type: 'system', text: USSD_MENUS.main.text }]);
   }, []);
 
@@ -228,9 +231,7 @@ export default function USSDBot() {
       <div className="bg-white border-b border-gray-100 px-4 py-4 sticky top-0 z-30">
         <div className="flex items-center gap-3 mb-3">
           <button onClick={() => navigate(-1)} className="p-1">
-            <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-            </svg>
+            <Icon name="arrowLeft" className="w-6 h-6 text-gray-600" />
           </button>
           <div>
             <h1 className="text-lg font-bold">USSD/SMS Bot</h1>

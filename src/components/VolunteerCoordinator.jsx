@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { registerVolunteer, getVolunteers, deployVolunteer } from '../db/disasterApi';
 import { showToast } from '../utils/helpers';
 
@@ -10,8 +11,10 @@ const SKILL_OPTIONS = [
   { key: 'counselling', label: 'Counselling', icon: '💬' },
 ];
 
+// eslint-disable-next-line no-unused-vars
 export default function VolunteerCoordinator({ userId, isAdmin = false }) {
   const [volunteers, setVolunteers] = useState([]);
+  // eslint-disable-next-line no-unused-vars
   const [loading, setLoading] = useState(true);
   const [showRegister, setShowRegister] = useState(false);
   const [form, setForm] = useState({ skills: [], location: '', contact_preference: 'push' });

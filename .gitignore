@@ -36,3 +36,10 @@ Thumbs.db
 
 # PWA
 *.tsbuildinfo
+
+.vercel
+.env*.local
+
+# Capacitor native platforms (generated)
+android/
+ios/

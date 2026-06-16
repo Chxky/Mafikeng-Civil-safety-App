@@ -9,18 +9,23 @@ import {
   removeIncident,
   getDepartmentNotifications,
 } from '../db/mockApi';
+import { getTransportRoutes, getTripHistory } from '../db/transportApi';
+import { getDisasterReports, getWeatherWarnings } from '../db/disasterApi';
 import {
   CATEGORIES,
   STATUSES,
   URGENCY_LEVELS,
   DEPARTMENTS,
+  // eslint-disable-next-line no-unused-vars
   CATEGORY_TO_DEPARTMENT,
   showToast,
   timeAgo,
+  formatDate,
 } from '../utils/helpers';
 
 export default function AdminDashboard() {
   const { user } = useAuth();
+  // eslint-disable-next-line no-unused-vars
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState('overview');
@@ -90,11 +95,43 @@ export default function AdminDashboard() {
     return true;
   });
 
+  const [transportRoutes, setTransportRoutes] = useState([]);
+  const [tripHistories, setTripHistories] = useState({});
+  const [disasterReports, setDisasterReports] = useState([]);
+  const [weatherWarnings, setWeatherWarnings] = useState([]);
+
+  useEffect(() => {
+    if (activeTab === 'transport') loadTransportData();
+    if (activeTab === 'disaster') loadDisasterData();
+  }, [activeTab]);
+
+  async function loadTransportData() {
+    const { data: routes } = await getTransportRoutes();
+    setTransportRoutes(routes || []);
+    const history = {};
+    for (const route of (routes || [])) {
+      const { data: trips } = await getTripHistory(route.id);
+      history[route.id] = trips || [];
+    }
+    setTripHistories(history);
+  }
+
+  async function loadDisasterData() {
+    const [reportsRes, warningsRes] = await Promise.all([
+      getDisasterReports(),
+      getWeatherWarnings(),
+    ]);
+    setDisasterReports(reportsRes.data || []);
+    setWeatherWarnings(warningsRes.data || []);
+  }
+
   const tabs = [
     { id: 'overview', label: 'Overview', icon: '📊' },
     { id: 'departments', label: 'Departments', icon: '🏛️' },
     { id: 'reports', label: 'Reports', icon: '📋' },
     { id: 'incidents', label: 'Incidents', icon: '🚨' },
+    { id: 'transport', label: 'Transport', icon: '🚌' },
+    { id: 'disaster', label: 'Disaster', icon: '🛡️' },
   ];
 
   if (loading) {
@@ -492,6 +529,94 @@ export default function AdminDashboard() {
                 <p className="text-gray-400 text-sm">No safety incidents</p>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Transport Tab */}
+      {activeTab === 'transport' && (
+        <div className="px-4 py-4 space-y-4">
+          <h2 className="font-bold text-sm text-gray-700">Scholar Transport Routes</h2>
+          {transportRoutes.length === 0 ? (
+            <div className="card text-center py-8">
+              <p className="text-gray-400 text-sm">No transport routes</p>
+            </div>
+          ) : transportRoutes.map(route => (
+            <div key={route.id} className="card">
+              <div className="flex items-start justify-between mb-2">
+                <div>
+                  <h3 className="font-bold text-sm">{route.name}</h3>
+                  <p className="text-xs text-gray-400">{route.school}</p>
+                </div>
+                <span className="badge bg-blue-100 text-blue-700 text-xs">{route.vehicle_registration || 'No vehicle'}</span>
+              </div>
+              <div className="text-xs text-gray-500 space-y-0.5 mb-3">
+                <p>👤 Driver: {route.driver_name || 'Unknown'}</p>
+                <p>📞 {route.driver_phone || 'No phone'}</p>
+              </div>
+              {tripHistories[route.id]?.length > 0 && (
+                <div className="border-t border-gray-100 pt-3">
+                  <p className="text-xs font-medium text-gray-600 mb-2">Recent Trips</p>
+                  <div className="space-y-1">
+                    {tripHistories[route.id].slice(0, 5).map(trip => (
+                      <div key={trip.id} className="flex items-center justify-between text-xs text-gray-500">
+                        <span className={`font-medium ${trip.status === 'arrived' ? 'text-safety-600' : trip.status === 'delayed' ? 'text-warning-600' : 'text-civic-600'}`}>
+                          {trip.status.replace('_', ' ')}
+                        </span>
+                        <span>{trip.started_at ? formatDate(trip.started_at) : 'N/A'}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Disaster Management Tab */}
+      {activeTab === 'disaster' && (
+        <div className="px-4 py-4 space-y-4">
+          {/* Active Warnings */}
+          <div>
+            <h3 className="font-bold text-sm text-gray-700 mb-3">Active Weather Warnings</h3>
+            {weatherWarnings.length === 0 ? (
+              <div className="card text-center py-4">
+                <p className="text-xs text-gray-400">No active warnings</p>
+              </div>
+            ) : weatherWarnings.map(w => (
+              <div key={w.id} className={`card border-l-4 mb-3 ${w.severity === 'warning' ? 'border-l-danger-500' : w.severity === 'watch' ? 'border-l-warning-500' : 'border-l-yellow-500'}`}>
+                <div className="flex items-start justify-between mb-1">
+                  <h4 className="font-bold text-sm capitalize">{w.event_type?.replace(/_/g, ' ')}</h4>
+                  <span className={`badge text-xs ${w.severity === 'warning' ? 'bg-danger-100 text-danger-700' : w.severity === 'watch' ? 'bg-warning-100 text-warning-700' : 'bg-yellow-100 text-yellow-700'}`}>{w.severity}</span>
+                </div>
+                <p className="text-xs text-gray-600">{w.description}</p>
+                <p className="text-xs text-gray-400 mt-1">{w.affected_areas}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Damage Reports */}
+          <div>
+            <h3 className="font-bold text-sm text-gray-700 mb-3">Damage Reports</h3>
+            {disasterReports.length === 0 ? (
+              <div className="card text-center py-4">
+                <p className="text-xs text-gray-400">No damage reports</p>
+              </div>
+            ) : disasterReports.map(r => (
+              <div key={r.id} className="card mb-3">
+                <div className="flex items-start justify-between mb-1">
+                  <h4 className="font-bold text-sm capitalize">{r.disaster_type?.replace(/_/g, ' ')}</h4>
+                  <span className={`badge text-xs ${r.status === 'active' ? 'bg-danger-100 text-danger-700' : r.status === 'assessed' ? 'bg-warning-100 text-warning-700' : 'bg-safety-100 text-safety-700'}`}>{r.status}</span>
+                </div>
+                <p className="text-xs text-gray-600">{r.description}</p>
+                <div className="flex items-center gap-2 mt-1 text-xs text-gray-400">
+                  <span>📍 {r.latitude?.toFixed(4)}, {r.longitude?.toFixed(4)}</span>
+                  <span>🕐 {timeAgo(r.created_at)}</span>
+                </div>
+                {r.needs_evacuation && <span className="badge bg-danger-100 text-danger-700 text-xs mt-2">🚨 Evacuation needed</span>}
+              </div>
+            ))}
           </div>
         </div>
       )}

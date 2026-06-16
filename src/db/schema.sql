@@ -572,6 +572,208 @@ CREATE TABLE municipal_alerts (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- ============================================================
+-- HEALTHCARE ACCESS
+-- ============================================================
+CREATE TABLE healthcare_facilities (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name TEXT NOT NULL,
+  facility_type TEXT NOT NULL CHECK (facility_type IN (
+    'hospital', 'clinic', 'community_health_centre', 'pharmacy', 'private_practice'
+  )),
+  phone TEXT,
+  address TEXT,
+  latitude DOUBLE PRECISION NOT NULL,
+  longitude DOUBLE PRECISION NOT NULL,
+  hours TEXT,
+  services TEXT[] DEFAULT '{}',
+  queue_wait_minutes INT DEFAULT 0,
+  queue_updated_at TIMESTAMPTZ,
+  has_medicine BOOLEAN DEFAULT true,
+  medicine_updated_at TIMESTAMPTZ,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE facility_reports (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  facility_id UUID REFERENCES healthcare_facilities(id) ON DELETE CASCADE,
+  user_token UUID REFERENCES user_tokens(id) ON DELETE SET NULL,
+  report_type TEXT NOT NULL CHECK (report_type IN (
+    'no_medicine', 'long_queue', 'facility_closed', 'staff_absent', 'other'
+  )),
+  description TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE appointment_reminders (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_token UUID REFERENCES user_tokens(id) ON DELETE CASCADE,
+  facility_id UUID REFERENCES healthcare_facilities(id) ON DELETE CASCADE,
+  appointment_date TIMESTAMPTZ NOT NULL,
+  notes TEXT,
+  is_reminded BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_healthcare_facilities_type ON healthcare_facilities(facility_type);
+CREATE INDEX idx_healthcare_facilities_location ON healthcare_facilities USING GIST (
+  ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)
+);
+
+-- ============================================================
+-- WATER QUALITY MONITORING
+-- ============================================================
+CREATE TABLE water_monitoring_points (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name TEXT NOT NULL,
+  point_type TEXT NOT NULL CHECK (point_type IN ('treatment_plant', 'river', 'reservoir', 'tap')),
+  latitude DOUBLE PRECISION NOT NULL,
+  longitude DOUBLE PRECISION NOT NULL,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE water_quality_readings (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  monitoring_point_id UUID REFERENCES water_monitoring_points(id) ON DELETE CASCADE,
+  ph_level DOUBLE PRECISION,
+  turbidity_ntu DOUBLE PRECISION,
+  e_coli_per_100ml INT,
+  chlorine_mg_per_l DOUBLE PRECISION,
+  is_safe BOOLEAN DEFAULT true,
+  reading_time TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_water_readings_point ON water_quality_readings(monitoring_point_id, reading_time DESC);
+CREATE INDEX idx_water_readings_safe ON water_quality_readings(is_safe);
+
+CREATE TABLE water_issues (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_token UUID REFERENCES user_tokens(id) ON DELETE SET NULL,
+  issue_type TEXT NOT NULL CHECK (issue_type IN (
+    'discoloured_water', 'no_water', 'bad_taste', 'bad_smell', 'other'
+  )),
+  description TEXT,
+  latitude DOUBLE PRECISION NOT NULL,
+  longitude DOUBLE PRECISION NOT NULL,
+  address TEXT,
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'investigating', 'resolved')),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ============================================================
+-- JOBS & TENDERS PORTAL
+-- ============================================================
+CREATE TABLE job_listings (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  title TEXT NOT NULL,
+  department TEXT NOT NULL,
+  listing_type TEXT NOT NULL CHECK (listing_type IN ('job', 'tender')),
+  description TEXT NOT NULL,
+  requirements TEXT,
+  location TEXT,
+  salary_range TEXT,
+  closing_date TIMESTAMPTZ NOT NULL,
+  contact_email TEXT,
+  contact_phone TEXT,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_job_listings_type ON job_listings(listing_type, is_active);
+CREATE INDEX idx_job_listings_closing ON job_listings(closing_date DESC);
+
+CREATE TABLE saved_listings (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_token UUID REFERENCES user_tokens(id) ON DELETE CASCADE,
+  listing_id UUID REFERENCES job_listings(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_token, listing_id)
+);
+
+CREATE TABLE job_alerts (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_token UUID REFERENCES user_tokens(id) ON DELETE CASCADE,
+  keywords TEXT[] DEFAULT '{}',
+  listing_type TEXT,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ============================================================
+-- BUSINESS DIRECTORY & MARKETPLACE
+-- ============================================================
+CREATE TABLE business_listings (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_token UUID REFERENCES user_tokens(id) ON DELETE SET NULL,
+  business_name TEXT NOT NULL,
+  category TEXT NOT NULL CHECK (category IN (
+    'retail', 'food_dining', 'services', 'health_beauty', 'education',
+    'agriculture', 'transport', 'accommodation', 'manufacturing', 'other'
+  )),
+  phone TEXT,
+  email TEXT,
+  website TEXT,
+  address TEXT,
+  latitude DOUBLE PRECISION,
+  longitude DOUBLE PRECISION,
+  description TEXT,
+  hours TEXT,
+  is_verified BOOLEAN DEFAULT false,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_business_listings_category ON business_listings(category, is_active);
+CREATE INDEX idx_business_listings_location ON business_listings USING GIST (
+  ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)
+);
+
+CREATE TABLE classified_listings (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_token UUID REFERENCES user_tokens(id) ON DELETE SET NULL,
+  listing_type TEXT NOT NULL CHECK (listing_type IN ('for_sale', 'wanted', 'services')),
+  title TEXT NOT NULL,
+  description TEXT,
+  price DECIMAL(12,2),
+  category TEXT,
+  phone TEXT,
+  latitude DOUBLE PRECISION,
+  longitude DOUBLE PRECISION,
+  is_anonymous BOOLEAN DEFAULT false,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_classified_listings_type ON classified_listings(listing_type, is_active);
+CREATE INDEX idx_classified_listings_created ON classified_listings(created_at DESC);
+
+-- ============================================================
+-- MUNICIPAL DOCUMENT VAULT
+-- ============================================================
+CREATE TABLE municipal_documents (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  title TEXT NOT NULL,
+  document_type TEXT NOT NULL CHECK (document_type IN (
+    'idp', 'sdbip', 'annual_report', 'budget', 'by_law',
+    'disaster_plan', 'council_minutes', 'policy', 'other'
+  )),
+  description TEXT,
+  file_url TEXT,
+  file_size_bytes BIGINT,
+  department TEXT,
+  year TEXT,
+  is_offline_available BOOLEAN DEFAULT false,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_municipal_documents_type ON municipal_documents(document_type, year);
+CREATE INDEX idx_municipal_documents_search ON municipal_documents USING GIN(to_tsvector('english', title || ' ' || COALESCE(description, '')));
+
 -- Enable RLS on new tables
 ALTER TABLE learners ENABLE ROW LEVEL SECURITY;
 ALTER TABLE trip_sessions ENABLE ROW LEVEL SECURITY;
@@ -579,6 +781,13 @@ ALTER TABLE stranded_reports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE disaster_reports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_safety_status ENABLE ROW LEVEL SECURITY;
 ALTER TABLE volunteers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE healthcare_facilities ENABLE ROW LEVEL SECURITY;
+ALTER TABLE water_monitoring_points ENABLE ROW LEVEL SECURITY;
+ALTER TABLE water_quality_readings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE job_listings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE business_listings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE classified_listings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE municipal_documents ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Parents can manage own learners" ON learners
   FOR ALL USING (parent_user_token IN (
@@ -591,3 +800,10 @@ CREATE POLICY "Public can read disaster reports" ON disaster_reports FOR SELECT 
 CREATE POLICY "Public can read weather warnings" ON weather_warnings FOR SELECT USING (true);
 CREATE POLICY "Public can read resilience resources" ON resilience_resources FOR SELECT USING (true);
 CREATE POLICY "Public can read municipal alerts" ON municipal_alerts FOR SELECT USING (true);
+CREATE POLICY "Public can read healthcare facilities" ON healthcare_facilities FOR SELECT USING (true);
+CREATE POLICY "Public can read water monitoring points" ON water_monitoring_points FOR SELECT USING (true);
+CREATE POLICY "Public can read water quality readings" ON water_quality_readings FOR SELECT USING (true);
+CREATE POLICY "Public can read job listings" ON job_listings FOR SELECT USING (true);
+CREATE POLICY "Public can read business listings" ON business_listings FOR SELECT USING (true);
+CREATE POLICY "Public can read classified listings" ON classified_listings FOR SELECT USING (true);
+CREATE POLICY "Public can read municipal documents" ON municipal_documents FOR SELECT USING (true);

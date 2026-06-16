@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getLearners, getActiveTrips } from '../db/transportApi';
 import { useAuth } from '../hooks/useAuth';
+import Icon from './Icon';
 
 export default function TransportWidget() {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ export default function TransportWidget() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!user?.id) { setLoading(false); return; }
     getLearners(user.id).then(({ data }) => {
       setLearnerCount((data || []).length);
@@ -46,9 +48,7 @@ export default function TransportWidget() {
             )}
           </div>
         </div>
-        <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-        </svg>
+        <Icon name="chevronRight" className="w-5 h-5 text-gray-400" />
       </div>
     </div>
   );

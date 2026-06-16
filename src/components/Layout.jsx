@@ -9,9 +9,16 @@ export default function Layout({ children }) {
   const hideNav = ['/admin', '/ussd'].includes(location.pathname);
 
   return (
-    <div className="page-container bg-gray-50 min-h-screen">
+    <div className="page-container bg-gray-50 dark:bg-gray-950 min-h-screen">
+      {/* Skip to content link for screen readers */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-civic-600 focus:text-white focus:rounded-lg focus:shadow-lg"
+      >
+        Skip to content
+      </a>
       {!isOnline && <OfflineBanner />}
-      <main className="flex-1">
+      <main id="main-content" className="flex-1 outline-none" tabIndex={-1}>
         {children}
       </main>
       {!hideNav && <BottomNav />}

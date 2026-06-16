@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { saveUserData } from '../db/offline';
 import { saveEmergencyContacts } from '../db/offline';
 import { showToast } from '../utils/helpers';
+import Icon from '../components/Icon';
 
 const SUBURBS = [
   'Central Mahikeng',
@@ -109,9 +110,7 @@ export default function SignUp() {
         <div className="flex items-center gap-3 mb-4">
           {step > 1 && (
             <button onClick={() => setStep(step - 1)} className="p-1">
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-              </svg>
+              <Icon name="arrowLeft" className="w-6 h-6" />
             </button>
           )}
           <div>
@@ -328,9 +327,7 @@ export default function SignUp() {
                     onClick={() => removeEmergencyContact(contact.id)}
                     className="p-2 text-danger-500 hover:bg-danger-50 rounded-xl"
                   >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                    <Icon name="close" className="w-5 h-5" />
                   </button>
                 </div>
               ))}
@@ -339,9 +336,7 @@ export default function SignUp() {
 
           {/* Privacy Note */}
           <div className="bg-safety-50 rounded-xl p-3 flex items-start gap-2">
-            <svg className="w-5 h-5 text-safety-600 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-            </svg>
+            <Icon name="shield" className="w-5 h-5 text-safety-600 flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-xs font-medium text-safety-700">Your Privacy</p>
               <p className="text-xs text-safety-600 mt-0.5">

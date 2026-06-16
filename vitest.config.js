@@ -5,5 +5,6 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: [],
+    exclude: ['node_modules', 'dist', '.idea', '.git', '.cache', 'e2e/**'],
   },
 });

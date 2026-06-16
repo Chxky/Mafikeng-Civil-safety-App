@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchStatus, fetchSchedule, isInLoadSheddingBlock, getNextBlock } from '../api/esp';
 import { cacheSchedule, getCachedSchedule, cachePowerStatus, getCachedPowerStatus } from '../db/offline';
+import Icon from './Icon';
 
 export default function PowerWidget() {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ export default function PowerWidget() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/immutability
     loadData();
   }, []);
 
@@ -90,9 +92,7 @@ export default function PowerWidget() {
               </p>
             </div>
           </div>
-          <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-          </svg>
+          <Icon name="chevronRight" className="w-5 h-5 text-gray-400" />
         </div>
 
         {currentBlock.active && (

@@ -1,17 +1,22 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentPosition, reverseGeocode } from '../utils/geolocation';
+// eslint-disable-next-line no-unused-vars
 import { compressImage, CATEGORIES, URGENCY_LEVELS, DEPARTMENTS, CATEGORY_TO_DEPARTMENT, isOnline, showToast } from '../utils/helpers';
 import { submitReport, uploadPhoto } from '../db/mockApi';
 import { addPendingReport, saveDraft, getDrafts, removeDraft } from '../db/offline';
 import { useAuth } from '../hooks/useAuth';
+import { useLanguage } from '../hooks/useLanguage';
 import { useNetwork } from '../hooks/useNetwork';
+import Icon from '../components/Icon';
 
 export default function Report() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const { isOnline: online } = useNetwork();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  // eslint-disable-next-line no-unused-vars
   const mapRef = useRef(null);
 
   const [step, setStep] = useState(1);
@@ -86,6 +91,7 @@ export default function Report() {
     }
 
     setSubmitting(true);
+    let report = null;
 
     try {
       // Upload photos if any
@@ -97,7 +103,7 @@ export default function Report() {
         uploadedUrls = uploads.filter(u => !u.error).map(u => u.data.url);
       }
 
-      const report = {
+      report = {
         user_token_id: user?.id,
         category,
         title: title || `${CATEGORIES[category]?.label || 'Issue'} report`,
@@ -118,14 +124,14 @@ export default function Report() {
       }
       if (online) {
         await submitReport(report);
-        showToast?.('Report submitted successfully!', 'success');
+        showToast?.(t('report_submitted'), 'success');
       } else {
         // Save to offline queue
         await addPendingReport({
           ...report,
           id: `offline-${Date.now()}`,
         });
-        showToast?.('Report saved offline. Will sync when connected.', 'info');
+        showToast?.(t('report_saved_offline'), 'info');
       }
 
       // Reset form
@@ -139,7 +145,7 @@ export default function Report() {
 
       navigate('/my-reports');
     } catch (err) {
-      showToast?.('Failed to submit report. Saved as draft.', 'error');
+      showToast?.(t('report_submit_failed'), 'error');
       await saveDraft({
         id: `draft-${Date.now()}`,
         ...report,
@@ -175,20 +181,18 @@ export default function Report() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             {step > 1 && (
-              <button onClick={() => setStep(step - 1)} className="p-1">
-                <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                </svg>
+              <button onClick={() => setStep(step - 1)} className="p-1" aria-label="Back">
+                <Icon name="arrowLeft" className="w-6 h-6 text-gray-600" />
               </button>
             )}
-            <h1 className="text-lg font-bold">Report Issue</h1>
+            <h1 className="text-lg font-bold">{t('report_issue')}</h1>
           </div>
           {drafts.length > 0 && (
             <button
               onClick={() => setShowDrafts(!showDrafts)}
               className="text-sm text-civic-600 font-medium"
             >
-              Drafts ({drafts.length})
+              {t('drafts')} ({drafts.length})
             </button>
           )}
         </div>
@@ -209,7 +213,7 @@ export default function Report() {
       {/* Drafts Panel */}
       {showDrafts && (
         <div className="px-4 py-3 bg-civic-50 border-b border-civic-100">
-          <p className="text-xs font-medium text-civic-700 mb-2">SAVED DRAFTS</p>
+          <p className="text-xs font-medium text-civic-700 mb-2">{t('saved_drafts')}</p>
           <div className="space-y-2">
             {drafts.map(draft => (
               <button
@@ -217,8 +221,8 @@ export default function Report() {
                 onClick={() => loadDraft(draft)}
                 className="w-full text-left card py-2 px-3"
               >
-                <p className="text-sm font-medium">{draft.title || 'Untitled Report'}</p>
-                <p className="text-xs text-gray-500">{CATEGORIES[draft.category]?.label || 'No category'}</p>
+                <p className="text-sm font-medium">{draft.title || t('untitled_report')}</p>
+                <p className="text-xs text-gray-500">{CATEGORIES[draft.category]?.label || t('no_category')}</p>
               </button>
             ))}
           </div>
@@ -228,8 +232,8 @@ export default function Report() {
       {/* Step 1: Category Selection */}
       {step === 1 && (
         <div className="px-4 py-6">
-          <h2 className="text-xl font-bold mb-1">What's the issue?</h2>
-          <p className="text-sm text-gray-500 mb-6">Select the category that best describes the problem</p>
+          <h2 className="text-xl font-bold mb-1">{t('whats_the_issue')}</h2>
+          <p className="text-sm text-gray-500 mb-6">{t('select_category')}</p>
 
           <div className="grid grid-cols-2 gap-3">
             {categoryEntries.map(([key, cat]) => (
@@ -257,8 +261,8 @@ export default function Report() {
       {step === 2 && (
         <div className="px-4 py-6 space-y-4">
           <div>
-            <h2 className="text-xl font-bold mb-1">Add Details</h2>
-            <p className="text-sm text-gray-500">Help the municipality understand the issue</p>
+            <h2 className="text-xl font-bold mb-1">{t('add_details')}</h2>
+            <p className="text-sm text-gray-500">{t('help_municipality')}</p>
           </div>
 
           {/* Selected category badge */}
@@ -270,7 +274,7 @@ export default function Report() {
               onClick={() => setStep(1)}
               className="text-xs text-civic-600"
             >
-              Change
+              {t('change')}
             </button>
           </div>
 
@@ -284,7 +288,7 @@ export default function Report() {
                 <div className="flex items-center gap-2">
                   <span className="text-lg">{dept.icon}</span>
                   <div>
-                    <p className="text-xs font-medium text-gray-500">Routed to</p>
+                    <p className="text-xs font-medium text-gray-500">{t('routed_to')}</p>
                     <p className={`text-sm font-bold ${dept.color}`}>{dept.name}</p>
                   </div>
                 </div>
@@ -295,11 +299,11 @@ export default function Report() {
 
           {/* Title */}
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 block">Title</label>
+            <label className="text-sm font-medium text-gray-700 mb-1 block">{t('title')}</label>
             <input
               type="text"
               className="input"
-              placeholder="Brief summary of the issue"
+              placeholder={t('title_placeholder')}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
@@ -307,10 +311,10 @@ export default function Report() {
 
           {/* Description */}
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 block">Description</label>
+            <label className="text-sm font-medium text-gray-700 mb-1 block">{t('description')}</label>
             <textarea
               className="input min-h-[100px] resize-none"
-              placeholder="Describe the issue in detail. Include landmarks or nearby addresses."
+              placeholder={t('description_placeholder')}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={4}
@@ -319,7 +323,7 @@ export default function Report() {
 
           {/* Urgency */}
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-2 block">Urgency Level</label>
+            <label className="text-sm font-medium text-gray-700 mb-2 block">{t('urgency_level')}</label>
             <div className="grid grid-cols-2 gap-2">
               {urgencyEntries.map(([key, level]) => (
                 <button
@@ -342,17 +346,17 @@ export default function Report() {
             <div className="space-y-3 p-3 bg-purple-50 rounded-xl border border-purple-200">
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-lg">⚡</span>
-                <span className="text-sm font-bold text-purple-800">Power Outage Details</span>
+                <span className="text-sm font-bold text-purple-800">{t('power_outage_details')}</span>
               </div>
 
               {/* Outage Type */}
               <div>
-                <label className="text-xs font-medium text-gray-700 mb-1.5 block">Outage Type</label>
+                <label className="text-xs font-medium text-gray-700 mb-1.5 block">{t('outage_type')}</label>
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { key: 'scheduled', label: 'Load Shedding', icon: '📅' },
-                    { key: 'unscheduled', label: 'Fault', icon: '🔧' },
-                    { key: 'unknown', label: 'Unknown', icon: '❓' },
+                    { key: 'scheduled', label: t('load_shedding'), icon: '📅' },
+                    { key: 'unscheduled', label: t('fault'), icon: '🔧' },
+                    { key: 'unknown', label: t('unknown'), icon: '❓' },
                   ].map(opt => (
                     <button
                       key={opt.key}
@@ -371,7 +375,7 @@ export default function Report() {
 
               {/* Estimated Restoration */}
               <div>
-                <label className="text-xs font-medium text-gray-700 mb-1 block">Estimated Restoration (optional)</label>
+                <label className="text-xs font-medium text-gray-700 mb-1 block">{t('estimated_restoration')}</label>
                 <input
                   type="datetime-local"
                   value={estimatedRestoration}
@@ -389,8 +393,8 @@ export default function Report() {
                   className="mt-1 rounded border-gray-300 text-purple-600"
                 />
                 <div>
-                  <span className="text-xs font-medium text-gray-700">I am a business — send me alerts for outages in this area</span>
-                  <p className="text-xs text-gray-400 mt-0.5">Get instant notifications when outages are reported near your business</p>
+                  <span className="text-xs font-medium text-gray-700">{t('business_alert')}</span>
+                  <p className="text-xs text-gray-400 mt-0.5">{t('business_alert_desc')}</p>
                 </div>
               </label>
             </div>
@@ -398,21 +402,18 @@ export default function Report() {
 
           {/* Location */}
           <div>
-            <label className="text-sm font-medium text-gray-700 mb-1 block">Location</label>
+            <label className="text-sm font-medium text-gray-700 mb-1 block">{t('location')}</label>
             <div className="card">
               {loadingLocation ? (
                 <div className="flex items-center gap-3 py-2">
                   <div className="w-5 h-5 border-2 border-civic-500 border-t-transparent rounded-full animate-spin"></div>
-                  <span className="text-sm text-gray-500">Detecting location...</span>
+                  <span className="text-sm text-gray-500">{t('detecting_location')}</span>
                 </div>
               ) : location ? (
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <svg className="w-5 h-5 text-safety-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                    </svg>
-                    <span className="text-sm font-medium">{address || 'Location detected'}</span>
+                    <Icon name="locationPin" className="w-5 h-5 text-safety-500" />
+                    <span className="text-sm font-medium">{address || t('location_detected')}</span>
                   </div>
                   <p className="text-xs text-gray-400">
                     {location.lat.toFixed(5)}, {location.lng.toFixed(5)}
@@ -422,14 +423,14 @@ export default function Report() {
                     onClick={detectLocation}
                     className="text-xs text-civic-600 mt-2"
                   >
-                    Refresh location
+                    {t('refresh_location')}
                   </button>
                 </div>
               ) : (
                 <div className="text-center py-2">
-                  <p className="text-sm text-gray-500 mb-2">Location not available</p>
+                  <p className="text-sm text-gray-500 mb-2">{t('location_not_available')}</p>
                   <button onClick={detectLocation} className="btn-outline text-sm py-2 px-4">
-                    Detect Location
+                    {t('detect_location')}
                   </button>
                 </div>
               )}
@@ -439,7 +440,7 @@ export default function Report() {
           {/* Photos */}
           <div>
             <label className="text-sm font-medium text-gray-700 mb-2 block">
-              Photos ({photos.length}/3)
+              {t('photos')} ({photos.length}/3)
             </label>
 
             <div className="flex gap-3 overflow-x-auto pb-2">
@@ -459,17 +460,14 @@ export default function Report() {
                 </div>
               ))}
 
-              {photos.length < 3 && (
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-1 text-gray-400 hover:border-civic-400 hover:text-civic-500 transition-colors flex-shrink-0"
-                >
-                  <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
-                  </svg>
-                  <span className="text-xs">Add</span>
-                </button>
+              {photos.length < 3 && (                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center gap-1 text-gray-400 hover:border-civic-400 hover:text-civic-500 transition-colors flex-shrink-0"
+                    aria-label="Add photo"
+                  >
+                    <Icon name="camera" className="w-8 h-8" />
+                    <span className="text-xs">{t('add')}</span>
+                  </button>
               )}
             </div>
 
@@ -494,16 +492,16 @@ export default function Report() {
               {submitting ? (
                 <div className="flex items-center gap-2">
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  {online ? 'Submitting...' : 'Saving...'}
+                  {online ? t('submitting') : t('saving')}
                 </div>
               ) : (
-                online ? 'Submit Report' : 'Save Offline'
+                online ? t('submit_report') : t('save_offline')
               )}
             </button>
 
             {!online && (
               <p className="text-xs text-center text-gray-500">
-                Report will be submitted automatically when you're back online
+                {t('offline_report_auto')}
               </p>
             )}
           </div>

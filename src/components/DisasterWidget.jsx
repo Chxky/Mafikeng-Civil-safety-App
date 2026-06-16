@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getWeatherWarnings } from '../db/disasterApi';
+import Icon from './Icon';
 
 const severityOrder = { warning: 3, watch: 2, advisory: 1 };
 
@@ -51,9 +52,7 @@ export default function DisasterWidget() {
         </div>
         <div className="flex items-center gap-2">
           {isWarning && <div className="w-2 h-2 rounded-full bg-danger-500 animate-pulse"></div>}
-          <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-          </svg>
+          <Icon name="chevronRight" className="w-5 h-5 text-gray-400" />
         </div>
       </div>
     </div>

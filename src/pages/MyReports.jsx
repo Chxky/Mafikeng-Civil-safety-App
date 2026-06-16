@@ -3,10 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { getCivicReports } from '../db/mockApi';
 import { getPendingReports } from '../db/offline';
 import { useAuth } from '../hooks/useAuth';
+import { useLanguage } from '../hooks/useLanguage';
+import Icon from '../components/Icon';
 import { CATEGORIES, STATUSES, URGENCY_LEVELS, timeAgo, formatDateTime } from '../utils/helpers';
 
 export default function MyReports() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [reports, setReports] = useState([]);
   const [pendingOffline, setPendingOffline] = useState([]);
@@ -15,7 +18,9 @@ export default function MyReports() {
   const [expandedId, setExpandedId] = useState(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/immutability
     loadReports();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function loadReports() {
@@ -56,11 +61,9 @@ export default function MyReports() {
       <div className="bg-white border-b border-gray-100 px-4 py-4 sticky top-0 z-30">
         <div className="flex items-center gap-3 mb-4">
           <button onClick={() => navigate(-1)} className="p-1">
-            <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-            </svg>
+            <Icon name="arrowLeft" className="w-6 h-6 text-gray-600" />
           </button>
-          <h1 className="text-lg font-bold">My Reports</h1>
+          <h1 className="text-lg font-bold">{t('my_reports')}</h1>
         </div>
 
         {/* Filter tabs */}
@@ -75,7 +78,7 @@ export default function MyReports() {
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
-              {key === 'all' ? 'All' : STATUSES[key]?.label || key} ({count})
+              {key === 'all' ? t('view_all') : STATUSES[key]?.label || key} ({count})
             </button>
           ))}
         </div>
@@ -95,18 +98,16 @@ export default function MyReports() {
           </div>
         ) : filteredReports.length === 0 ? (
           <div className="card text-center py-12">
-            <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" />
-            </svg>
-            <p className="text-gray-400 font-medium">No reports found</p>
+            <Icon name="documentText" className="w-16 h-16 text-gray-300 mx-auto mb-4" strokeWidth={1} />
+            <p className="text-gray-400 font-medium">{t('no_reports_found')}</p>
             <p className="text-sm text-gray-400 mt-1">
-              {filter === 'all' ? 'Start by reporting an issue' : `No ${STATUSES[filter]?.label?.toLowerCase() || ''} reports`}
+              {filter === 'all' ? t('start_reporting') : t('no_status_reports', { status: STATUSES[filter]?.label?.toLowerCase() || '' })}
             </p>
             <button
               onClick={() => navigate('/report')}
               className="btn-primary mt-4 text-sm"
             >
-              Report an Issue
+              {t('report_an_issue')}
             </button>
           </div>
         ) : (
@@ -146,7 +147,7 @@ export default function MyReports() {
                         <div className="flex items-center gap-2 mt-2">
                           {report._offline && (
                             <span className="badge bg-warning-100 text-warning-700">
-                              📡 Offline
+                              📡 {t('offline')}
                             </span>
                           )}
                           <span className={`badge ${urgency.bg} ${urgency.color}`}>
@@ -214,8 +215,8 @@ export default function MyReports() {
 
                       {/* Metadata */}
                       <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400">
-                        <span>Reported {formatDateTime(report.created_at)}</span>
-                        <span>ID: {report.id.substring(0, 8)}</span>
+                        <span>{t('reported')} {formatDateTime(report.created_at)}</span>
+                        <span>{t('report_id')}: {report.id.substring(0, 8)}</span>
                       </div>
                     </div>
                   )}

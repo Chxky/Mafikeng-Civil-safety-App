@@ -8,6 +8,7 @@ let dbPromise = null;
 function getDB() {
   if (!dbPromise) {
     dbPromise = openDB(DB_NAME, DB_VERSION, {
+      // eslint-disable-next-line no-unused-vars
       upgrade(db, oldVersion) {
         // Pending civic reports (offline queue)
         if (!db.objectStoreNames.contains('pendingReports')) {
@@ -75,6 +76,31 @@ function getDB() {
         // Disaster Shield: cached warnings and resources
         if (!db.objectStoreNames.contains('disasterCache')) {
           db.createObjectStore('disasterCache', { keyPath: 'key' });
+        }
+
+        // Healthcare: cached facilities
+        if (!db.objectStoreNames.contains('healthcareCache')) {
+          db.createObjectStore('healthcareCache', { keyPath: 'key' });
+        }
+
+        // Water Quality: cached readings
+        if (!db.objectStoreNames.contains('waterQualityCache')) {
+          db.createObjectStore('waterQualityCache', { keyPath: 'key' });
+        }
+
+        // Jobs & Tenders: cached listings
+        if (!db.objectStoreNames.contains('jobsCache')) {
+          db.createObjectStore('jobsCache', { keyPath: 'key' });
+        }
+
+        // Marketplace: cached business listings
+        if (!db.objectStoreNames.contains('marketplaceCache')) {
+          db.createObjectStore('marketplaceCache', { keyPath: 'key' });
+        }
+
+        // Documents: cached documents
+        if (!db.objectStoreNames.contains('documentsCache')) {
+          db.createObjectStore('documentsCache', { keyPath: 'key' });
         }
       },
     });

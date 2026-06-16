@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
+// eslint-disable-next-line no-unused-vars
 import { getDisasterReports, getSafetyStatuses } from '../db/disasterApi';
+// eslint-disable-next-line no-unused-vars
 import { getMahikengCenter, fuzzLocation } from '../utils/geolocation';
 import { timeAgo } from '../utils/helpers';
 

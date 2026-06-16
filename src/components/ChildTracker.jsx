@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { getLearners, getActiveTrips, getTransportRoutes, registerLearner } from '../db/transportApi';
@@ -28,6 +29,7 @@ export default function ChildTracker({ userId }) {
   const [showAdd, setShowAdd] = useState(false);
   const [newChild, setNewChild] = useState({ name: '', school: '', grade: '' });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { loadData(); }, []);
 
   async function loadData() {

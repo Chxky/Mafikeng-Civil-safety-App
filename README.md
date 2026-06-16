@@ -30,7 +30,7 @@ Mahikeng, the capital of South Africa's North West Province, faces severe challe
 
 ---
 
-## Modules (10 Integrated Modules)
+## Modules (12 Integrated Modules)
 
 ### 1. Civic Infrastructure Reporting
 

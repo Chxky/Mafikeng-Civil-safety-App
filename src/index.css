@@ -8,7 +8,7 @@
   }
 
   body {
-    @apply font-sans text-gray-900 antialiased;
+    @apply font-sans text-gray-900 dark:text-gray-100 antialiased bg-white dark:bg-gray-950;
     overscroll-behavior-y: none;
     -webkit-font-smoothing: antialiased;
   }
@@ -23,35 +23,35 @@
 
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center rounded-xl px-6 py-3 font-semibold text-white transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center rounded-xl px-6 py-3 font-semibold text-white transition-all duration-300 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-primary {
-    @apply btn bg-civic-600 hover:bg-civic-700 shadow-lg shadow-civic-600/25;
+    @apply btn bg-gradient-to-r from-civic-500 to-civic-600 hover:from-civic-600 hover:to-civic-700 shadow-xl shadow-civic-600/30 hover:shadow-civic-600/50 hover:-translate-y-0.5;
   }
 
   .btn-danger {
-    @apply btn bg-danger-600 hover:bg-danger-700 shadow-lg shadow-danger-600/25;
+    @apply btn bg-gradient-to-r from-danger-500 to-danger-600 hover:from-danger-600 hover:to-danger-700 shadow-xl shadow-danger-600/30 hover:shadow-danger-600/50 hover:-translate-y-0.5;
   }
 
   .btn-safety {
-    @apply btn bg-safety-600 hover:bg-safety-700 shadow-lg shadow-safety-600/25;
+    @apply btn bg-gradient-to-r from-safety-500 to-safety-600 hover:from-safety-600 hover:to-safety-700 shadow-xl shadow-safety-600/30 hover:shadow-safety-600/50 hover:-translate-y-0.5;
   }
 
   .btn-outline {
-    @apply btn border-2 border-civic-600 text-civic-600 bg-transparent hover:bg-civic-50;
+    @apply btn border-[1.5px] border-civic-500/50 text-civic-600 dark:text-civic-400 bg-transparent hover:bg-civic-50 dark:hover:bg-civic-900/30 hover:border-civic-500;
   }
 
   .btn-ghost {
-    @apply btn text-gray-600 hover:bg-gray-100;
+    @apply btn text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800/50;
   }
 
   .card {
-    @apply bg-white rounded-2xl shadow-sm border border-gray-100 p-4;
+    @apply bg-white dark:bg-gray-900 rounded-2xl shadow-lg shadow-gray-200/50 dark:shadow-gray-900/50 border border-gray-100/50 dark:border-gray-800/50 p-5 backdrop-blur-sm transition-all duration-300 hover:shadow-xl dark:hover:shadow-black/60;
   }
 
   .input {
-    @apply w-full rounded-xl border border-gray-200 px-4 py-3 text-gray-900 placeholder-gray-400
+    @apply w-full rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-3 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 bg-white dark:bg-gray-800
            focus:border-civic-500 focus:ring-2 focus:ring-civic-500/20 focus:outline-none
            transition-all duration-200;
   }
@@ -77,39 +77,47 @@
   }
 
   .page-container {
-    @apply min-h-screen pb-24 pt-safe;
+    @apply min-h-screen pb-32 pt-safe;
   }
 
   .section-title {
-    @apply text-lg font-bold text-gray-900 mb-3;
+    @apply text-lg font-bold text-gray-900 dark:text-gray-100 mb-3;
   }
 
   .sos-button {
-    @apply w-20 h-20 rounded-full bg-danger-600 text-white flex items-center justify-center
-           shadow-2xl shadow-danger-600/50 animate-sos-glow active:scale-90 transition-transform;
+    @apply w-20 h-20 rounded-full bg-gradient-to-br from-danger-500 to-danger-600 text-white flex items-center justify-center
+           shadow-[0_0_40px_rgba(225,29,72,0.6)] active:scale-90 transition-transform relative z-10;
+    animation: sos-glow 2s ease-in-out infinite;
+  }
+
+  .sos-button::before {
+    content: '';
+    @apply absolute inset-0 rounded-full bg-danger-500 opacity-50 z-[-1];
+    animation: ripple 1.5s cubic-bezier(0, 0.2, 0.8, 1) infinite;
   }
 
   .sos-button-pressed {
-    @apply bg-danger-700 animate-pulse;
+    @apply from-danger-600 to-danger-700 shadow-[0_0_20px_rgba(225,29,72,0.8)];
+    animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 
   .bottom-nav {
-    @apply fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50;
-    padding-bottom: max(env(safe-area-inset-bottom), 0.5rem);
+    @apply fixed bottom-4 left-4 right-4 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/20 dark:border-gray-800/50 z-50 rounded-2xl shadow-2xl shadow-civic-900/10 dark:shadow-black/50;
+    padding-bottom: env(safe-area-inset-bottom);
   }
 
   .nav-item {
-    @apply flex flex-col items-center justify-center py-2 px-3 text-gray-400
-           transition-colors duration-200 relative;
+    @apply flex flex-col items-center justify-center py-3 px-3 text-gray-400
+           transition-all duration-300 relative hover:-translate-y-1 hover:text-gray-600 dark:hover:text-gray-300;
   }
 
   .nav-item.active {
-    @apply text-civic-600;
+    @apply text-civic-600 dark:text-civic-400 scale-110;
   }
 
   .nav-item.active::before {
     content: '';
-    @apply absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-civic-600 rounded-full;
+    @apply absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-civic-600 dark:bg-civic-400 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.8)];
   }
 
   .status-timeline {
@@ -130,11 +138,11 @@
   }
 
   .map-container {
-    @apply w-full rounded-xl overflow-hidden border border-gray-200;
+    @apply w-full rounded-2xl overflow-hidden border border-gray-200/50 dark:border-gray-800/50 shadow-xl;
   }
 
   .feed-card {
-    @apply card hover:shadow-md transition-shadow duration-200 cursor-pointer;
+    @apply card hover:-translate-y-1 cursor-pointer;
   }
 
   .incident-marker {
@@ -142,8 +150,18 @@
   }
 
   .toast {
-    @apply fixed top-4 left-4 right-4 z-[100] bg-gray-900 text-white px-4 py-3 rounded-xl
-           shadow-2xl animate-slide-up flex items-center gap-3;
+    @apply fixed top-4 left-4 right-4 z-[100] bg-gray-900/90 dark:bg-gray-800/90 backdrop-blur-md text-white px-5 py-4 rounded-2xl
+           shadow-2xl shadow-black/20 border border-white/10 animate-slide-up flex items-center gap-3;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/30;
+  }
+  
+  .glass-card {
+    @apply glass shadow-xl shadow-civic-900/5 dark:shadow-black/40 rounded-2xl;
   }
 }
 
