@@ -168,7 +168,7 @@ export default function OutageMap({ standalone = false }) {
                       handleConfirm(cell.reports[0].id);
                     }}
                     className="mt-2 w-full bg-civic-600 text-white text-xs py-1.5 px-3 rounded-lg font-medium"
-                  >                    ⚡ I'm also affected ({confirmations[cell.reports[0]?.id] || 0})
+                  >                    ⚡ I&apos;m also affected ({confirmations[cell.reports[0]?.id] || 0})
                   </button>
                 </div>
               </Popup>

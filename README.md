@@ -2,7 +2,7 @@
 
 > The definitive civic super-app for Mahikeng, North West Province, South Africa — a single digital platform connecting residents, businesses, and government for infrastructure reporting, community safety, emergency response, service delivery, and disaster resilience.
 
-**Author:** Pardon Mahara  
+**Author:** TK EUSTACE PROJECTS (PTY) LTD (in cooperation with nextlyTech)  
 **License:** Source-Available (c) 2026 — All Rights Reserved  
 **Location:** Mahikeng, North West Province, South Africa  
 **Compliance:** POPI Act (Protection of Personal Information Act, 2013)
@@ -416,7 +416,7 @@ mafikeng/
 ├── tailwind.config.js
 ├── postcss.config.js
 ├── package.json
-├── LICENSE                       # MIT License (c) 2026 Pardon Mahara
+├── LICENSE                       # MIT License (c) 2026 TK EUSTACE PROJECTS (PTY) LTD
 └── README.md                     # This file
 ```
 
@@ -475,13 +475,13 @@ All numbers are one-tap callable from the app.
 
 **Source-Available — All Rights Reserved**
 
-Copyright (c) 2026 Pardon Mahara
+Copyright (c) 2026 TK EUSTACE PROJECTS (PTY) LTD
 
 This is **not open-source software**. The source code is made available for transparency and auditability, but all rights are reserved by the author.
 
 **You may:** Install, run, and deploy the Software for civic/community use. View and read the source code.
 
-**You may not:** Modify, redistribute, sell, sublicense, or create derivative works without explicit written permission from the author. Only Pardon Mahara has the right to modify and update this Software.
+**You may not:** Modify, redistribute, sell, sublicense, or create derivative works without explicit written permission from the author. Only TK EUSTACE PROJECTS (PTY) LTD has the right to modify and update this Software.
 
 For commercial licensing, modifications, or redistribution, contact the author.
 
@@ -489,4 +489,4 @@ See [LICENSE](./LICENSE) for full terms.
 
 ---
 
-*Built with care by Pardon Mahara for the Mahikeng Community, 2026.*
+*Built with care by TK EUSTACE PROJECTS (PTY) LTD for the Mahikeng Community, 2026.*

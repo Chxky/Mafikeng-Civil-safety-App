@@ -85,7 +85,7 @@ function StrandedTab({ userId }) {
     <div className="px-4 py-4 space-y-4">
       <div className="card text-center py-8">
         <span className="text-4xl block mb-3">🚨</span>
-        <h3 className="font-bold text-sm mb-2">My Child is Stranded</h3>        <p className="text-xs text-gray-500 mb-4">Report that your child's transport has not arrived. Other parents and the school will be alerted.</p>
+        <h3 className="font-bold text-sm mb-2">My Child is Stranded</h3>        <p className="text-xs text-gray-500 mb-4">Report that your child&apos;s transport has not arrived. Other parents and the school will be alerted.</p>
         <button onClick={handleReportStranded} disabled={reporting} className="btn-danger">
           {reporting ? 'Sending...' : '🚨 Report Stranded'}
         </button>

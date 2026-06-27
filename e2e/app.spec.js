@@ -18,9 +18,8 @@ test.describe('Mahikeng Civic Safety App', () => {
     await expect(sosButton).toBeVisible();
 
     // Service hub grid should have 12+ service buttons
-    // eslint-disable-next-line no-unused-vars
-    // eslint-disable-next-line no-unused-vars
-    const serviceButtons = page.locator('button').filter({ has: page.locator('.grid.grid-cols-4') });
+
+    await expect(page.locator('button').filter({ has: page.locator('.grid.grid-cols-4') }).first()).toBeVisible();
     // Quick stats should render
     await expect(page.locator('.glass-card .text-3xl.font-black').first()).toBeVisible();
   });
@@ -84,10 +83,8 @@ test.describe('Mahikeng Civic Safety App', () => {
     await page.goto(`${BASE_URL}/#/report`);
     await page.waitForLoadState('networkidle');
 
-    // eslint-disable-next-line no-unused-vars
     // Should show category selection
-    // eslint-disable-next-line no-unused-vars
-    const categoryButtons = page.locator('button').filter({ has: page.locator('.grid.grid-cols-2') });
+    await expect(page.locator('button').filter({ has: page.locator('.grid.grid-cols-2') }).first()).toBeVisible();
     await expect(page.locator('h2').filter({ hasText: /what|issue/ }).first().or(page.locator('h1').filter({ hasText: /report|issue/ }).first())).toBeVisible();
   });
 

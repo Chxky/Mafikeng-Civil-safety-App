@@ -132,7 +132,7 @@ export default function DocumentsScreen() {
 
           {searchQuery && filteredDocs.length === 0 && !loading && (
             <div className="card text-center py-8">
-              <span className="text-4xl block mb-3">🔍</span>              <p className="text-sm text-gray-500">No results for "{searchQuery}"</p>
+              <span className="text-4xl block mb-3">🔍</span>              <p className="text-sm text-gray-500">No results for &quot;{searchQuery}&quot;</p>
             </div>
           )}
 

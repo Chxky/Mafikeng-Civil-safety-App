@@ -48,11 +48,14 @@ export default function Home() {
         </div>
 
         <div className="flex items-center justify-between mb-8 relative z-10">
-          <div>
-            <h1 className="text-3xl font-black tracking-tight drop-shadow-md">{t('home_greeting')}</h1>
-            <p className="text-civic-200 text-sm mt-1 font-medium tracking-wide">
-              {user?.displayName || t('community_member')}
-            </p>
+          <div className="flex items-center gap-3">
+            <img src="/logo-mafikeng.jpg" alt="Mahikeng Civic Safety" className="w-12 h-12 rounded-xl shadow-lg border-2 border-white/20 object-contain bg-white" />
+            <div>
+              <h1 className="text-3xl font-black tracking-tight drop-shadow-md">{t('home_greeting')}</h1>
+              <p className="text-civic-200 text-sm mt-1 font-medium tracking-wide">
+                {user?.displayName || t('community_member')}
+              </p>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <LanguageSelector variant="page" />

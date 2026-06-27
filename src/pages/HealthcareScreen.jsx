@@ -171,7 +171,7 @@ export default function HealthcareScreen() {
               <p className="text-xs text-gray-400 mt-1">{showReport.name}</p>
             </div>
             <div className="px-4 py-4 space-y-4">
-              <div>                <label className="text-sm font-medium text-gray-700 mb-2 block">What's the issue?</label>
+              <div>                <label className="text-sm font-medium text-gray-700 mb-2 block">What&apos;s the issue?</label>
                 <div className="grid grid-cols-2 gap-2">
                   {REPORT_TYPES.map(rt => (
                     <button key={rt.key} onClick={() => setReportType(rt.key)}

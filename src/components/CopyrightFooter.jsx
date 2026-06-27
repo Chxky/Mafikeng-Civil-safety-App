@@ -4,16 +4,17 @@ export default function CopyrightFooter() {
       <div className="max-w-lg mx-auto text-center">
         {/* App Logo */}
         <div className="flex items-center justify-center gap-2 mb-3">
-          <div className="w-8 h-8 rounded-lg bg-civic-600 flex items-center justify-center">
-            <span className="text-white font-bold text-sm">M</span>
-          </div>
+          <img src="/logo-mafikeng.jpg" alt="Mahikeng Civic Safety" className="w-8 h-8 rounded-lg object-contain bg-white" />
           <span className="font-bold text-gray-800 dark:text-gray-200">Mahikeng Civic Safety</span>
         </div>
 
         {/* Copyright */}
-        <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
-          &copy; 2026 Pardon Mahara
-        </p>
+        <div className="flex flex-col items-center justify-center mb-2">
+          <img src="/logo-tke.jpg" alt="TK EUSTACE PROJECTS" className="h-10 object-contain mb-1" />
+          <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+            &copy; 2026 TK EUSTACE PROJECTS (PTY) LTD
+          </p>
+        </div>
         <p className="text-xs text-gray-400 mt-1">
           Built for the Mahikeng Community
         </p>

@@ -1,6 +1,6 @@
 import { useEffect, lazy, Suspense } from 'react';
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './hooks/useAuth';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './hooks/useAuth';
 import { LanguageProvider } from './hooks/useLanguage';
 import { ThemeProvider } from './hooks/useTheme';
 import Layout from './components/Layout';
@@ -17,7 +17,7 @@ const MyReports = lazy(() => import('./pages/MyReports'));
 const SafetyFeed = lazy(() => import('./pages/SafetyFeed'));
 const MapView = lazy(() => import('./pages/MapView'));
 const Profile = lazy(() => import('./pages/Profile'));
-const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+
 const PatrolMode = lazy(() => import('./pages/PatrolMode'));
 const USSDBot = lazy(() => import('./pages/USSDBot'));
 const SignUp = lazy(() => import('./pages/SignUp'));
@@ -34,12 +34,6 @@ import { syncPendingReports } from './db/offline';
 import { submitReport } from './db/mockApi';
 import { showToast } from './utils/helpers';
 
-function AdminRoute() {
-  const { user, loading } = useAuth();
-  if (loading) return null;
-  if (!user?.is_moderator) return <Navigate to="/" replace />;
-  return <AdminDashboard />;
-}
 
 function SyncManager() {
   useEffect(() => {
@@ -85,7 +79,7 @@ export default function App() {
             <Route path="/edutrans" element={<div className="animate-fade-in"><EduTransScreen /></div>} />
             <Route path="/disaster" element={<div className="animate-fade-in"><DisasterShieldScreen /></div>} />
             <Route path="/profile" element={<div className="animate-fade-in"><Profile /></div>} />
-            <Route path="/admin" element={<div className="animate-fade-in"><AdminRoute /></div>} />
+
             <Route path="/patrol" element={<div className="animate-fade-in"><PatrolMode /></div>} />
             <Route path="/ussd" element={<div className="animate-fade-in"><USSDBot /></div>} />
             <Route path="/signup" element={<div className="animate-fade-in"><SignUp /></div>} />

@@ -148,7 +148,7 @@ function MapTab({ userId }) {
   return (
     <div className="px-4 py-4 space-y-4">
       <div className="flex gap-2">
-        <button onClick={() => handleSafetyStatus('safe')} className={`flex-1 py-3 rounded-xl text-sm font-medium border ${safetyStatus === 'safe' ? 'bg-safety-100 text-safety-700 border-safety-300' : 'border-gray-200 text-gray-600'}`}>          ✅ I'm Safe
+        <button onClick={() => handleSafetyStatus('safe')} className={`flex-1 py-3 rounded-xl text-sm font-medium border ${safetyStatus === 'safe' ? 'bg-safety-100 text-safety-700 border-safety-300' : 'border-gray-200 text-gray-600'}`}>          ✅ I&apos;m Safe
         </button>
         <button onClick={() => handleSafetyStatus('need_help')} className={`flex-1 py-3 rounded-xl text-sm font-medium border ${safetyStatus === 'need_help' ? 'bg-danger-100 text-danger-700 border-danger-300' : 'border-gray-200 text-gray-600'}`}>
           🆘 Need Help

@@ -6,6 +6,7 @@ const navItems = [
   { path: '/', labelKey: 'nav_home', icon: 'home' },
   { path: '/report', labelKey: 'nav_report', icon: 'addCircle' },
   { path: '/map', labelKey: 'nav_map', icon: 'map' },
+  { path: '/edutrans', labelKey: 'EduTrans', icon: 'users' },
   { path: '/profile', labelKey: 'nav_profile', icon: 'user' },
 ];
 

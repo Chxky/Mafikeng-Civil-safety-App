@@ -114,7 +114,7 @@ export default function ESPWidget({ compact = false }) {
 
       {/* Today's Schedule */}
       {schedule && (
-        <div className="card">          <h3 className="text-sm font-bold text-gray-800 mb-3">Today's Schedule</h3>
+        <div className="card">          <h3 className="text-sm font-bold text-gray-800 mb-3">Today&apos;s Schedule</h3>
           {schedule.today && schedule.today.length > 0 ? (
             <div className="space-y-2">
               {schedule.today.map((block, i) => {
