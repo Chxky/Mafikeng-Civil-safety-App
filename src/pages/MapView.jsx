@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { getCivicReports, getSafetyIncidents } from '../db/mockApi';
+import { getCivicReports, getSafetyIncidents } from '../db/api';
 import { getDisasterReports } from '../db/disasterApi';
 import { getMahikengCenter, getMahikengBounds, fuzzLocation } from '../utils/geolocation';
 import { CATEGORIES, INCIDENT_TYPES, STATUSES, timeAgo } from '../utils/helpers';

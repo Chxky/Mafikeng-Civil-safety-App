@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../hooks/useLanguage';
 import { useNetwork } from '../hooks/useNetwork';
 import { useTheme } from '../hooks/useTheme';
-import { getCivicReports, getDashboardStats } from '../db/mockApi';
+import { getCivicReports, getDashboardStats } from '../db/api';
 import { getEmergencyContacts, saveEmergencyContacts } from '../db/offline';
 import { showToast } from '../utils/helpers';
 import { requestNotificationPermission, subscribeToPush, unsubscribeFromPush, isSubscribed } from '../utils/notifications';

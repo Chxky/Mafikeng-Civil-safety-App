@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentPosition } from '../utils/geolocation';
 import { vibrate } from '../utils/helpers';
-import { createSOSAlert } from '../db/mockApi';
+import { createSOSAlert } from '../db/api';
 import { supabase, isLive } from '../db/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../hooks/useLanguage';

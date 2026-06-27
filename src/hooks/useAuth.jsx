@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, createContext, useContext } from 'react';
 import { getOrCreateUserToken, generateDisplayName } from '../utils/encryption';
-import { createOrGetToken } from '../db/mockApi';
+import { createOrGetToken } from '../db/api';
 
 const AuthContext = createContext(null);
 

@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 // eslint-disable-next-line no-unused-vars
 import { getCurrentPosition, watchPosition, clearWatch } from '../utils/geolocation';
 import { showToast, timeAgo } from '../utils/helpers';
-import { getPatrolGroups, getPatrolMessages, sendPatrolMessage, getActivePatrollers } from '../db/mockApi';
+import { getPatrolGroups, getPatrolMessages, sendPatrolMessage, getActivePatrollers } from '../db/api';
 import { supabase, isLive } from '../db/supabase';
 import { encryptMessage, decryptMessage, generateEncryptionKey, exportKey, importKey } from '../utils/encryption';
 import Icon from '../components/Icon';

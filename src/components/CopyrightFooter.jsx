@@ -12,7 +12,7 @@ export default function CopyrightFooter() {
         <div className="flex flex-col items-center justify-center mb-2">
           <img src="/logo-tke.jpg" alt="TK EUSTACE PROJECTS" className="h-10 object-contain mb-1" />
           <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
-            &copy; 2026 TK EUSTACE PROJECTS (PTY) LTD
+            &copy; 2026 TK EUSTACE PROJECTS (PTY) LTD and nextlytech
           </p>
         </div>
         <p className="text-xs text-gray-400 mt-1">

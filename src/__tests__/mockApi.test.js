@@ -17,7 +17,7 @@ import {
   getDashboardStats,
   processSMSReport,
   getSMSReports,
-} from '../db/mockApi';
+} from '../db/api';
 
 describe('createOrGetToken', () => {
   it('creates a new user token', async () => {

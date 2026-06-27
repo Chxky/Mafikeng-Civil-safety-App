@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getSafetyIncidents, submitIncident, confirmIncident } from '../db/mockApi';
+import { getSafetyIncidents, submitIncident, confirmIncident } from '../db/api';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../hooks/useLanguage';
 import Icon from '../components/Icon';

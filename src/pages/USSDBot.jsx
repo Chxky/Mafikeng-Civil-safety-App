@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { processSMSReport, getSMSReports } from '../db/mockApi';
+import { processSMSReport, getSMSReports } from '../db/api';
 import { showToast, timeAgo } from '../utils/helpers';
 import Icon from '../components/Icon';
 

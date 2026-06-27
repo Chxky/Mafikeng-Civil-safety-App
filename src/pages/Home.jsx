@@ -8,7 +8,7 @@ import LanguageSelector from '../components/LanguageSelector';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../hooks/useLanguage';
 import Icon from '../components/Icon';
-import { getCivicReports, getDashboardStats } from '../db/mockApi';
+import { getCivicReports, getDashboardStats } from '../db/api';
 import { CATEGORIES, STATUSES, timeAgo } from '../utils/helpers';
 
 export default function Home() {

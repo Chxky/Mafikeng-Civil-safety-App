@@ -31,7 +31,7 @@ const JobsScreen = lazy(() => import('./pages/JobsScreen'));
 const MarketplaceScreen = lazy(() => import('./pages/MarketplaceScreen'));
 const DocumentsScreen = lazy(() => import('./pages/DocumentsScreen'));
 import { syncPendingReports } from './db/offline';
-import { submitReport } from './db/mockApi';
+import { submitReport } from './db/api';
 import { showToast } from './utils/helpers';
 
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getCommunityLeaders } from '../db/mockApi';
+import { getCommunityLeaders } from '../db/api';
 import Icon from '../components/Icon';
 
 const CATEGORIES = {

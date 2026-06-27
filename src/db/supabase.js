@@ -3,8 +3,8 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Returns null if env vars are missing (demo mode) or if in testing mode
-export const supabase = supabaseUrl && supabaseAnonKey && import.meta.env.MODE !== 'test'
+// Initialize Supabase client
+export const supabase = supabaseUrl && supabaseAnonKey
   ? createClient(supabaseUrl, supabaseAnonKey)
   : null;
 

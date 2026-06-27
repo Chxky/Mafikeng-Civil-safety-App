@@ -19,7 +19,7 @@ test.describe('Mahikeng Civic Safety App', () => {
 
     // Service hub grid should have 12+ service buttons
 
-    await expect(page.locator('button').filter({ has: page.locator('.grid.grid-cols-4') }).first()).toBeVisible();
+    await expect(page.locator('.grid.grid-cols-4 button').first()).toBeVisible();
     // Quick stats should render
     await expect(page.locator('.glass-card .text-3xl.font-black').first()).toBeVisible();
   });
@@ -84,7 +84,7 @@ test.describe('Mahikeng Civic Safety App', () => {
     await page.waitForLoadState('networkidle');
 
     // Should show category selection
-    await expect(page.locator('button').filter({ has: page.locator('.grid.grid-cols-2') }).first()).toBeVisible();
+    await expect(page.locator('.grid.grid-cols-2 button').first()).toBeVisible();
     await expect(page.locator('h2').filter({ hasText: /what|issue/ }).first().or(page.locator('h1').filter({ hasText: /report|issue/ }).first())).toBeVisible();
   });
 

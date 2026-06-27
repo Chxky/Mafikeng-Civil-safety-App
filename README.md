@@ -416,7 +416,7 @@ mafikeng/
 ├── tailwind.config.js
 ├── postcss.config.js
 ├── package.json
-├── LICENSE                       # MIT License (c) 2026 TK EUSTACE PROJECTS (PTY) LTD
+├── LICENSE                       # MIT License (c) 2026 TK EUSTACE PROJECTS (PTY) LTD and nextlytech
 └── README.md                     # This file
 ```
 
@@ -475,7 +475,7 @@ All numbers are one-tap callable from the app.
 
 **Source-Available — All Rights Reserved**
 
-Copyright (c) 2026 TK EUSTACE PROJECTS (PTY) LTD
+Copyright (c) 2026 TK EUSTACE PROJECTS (PTY) LTD and nextlytech
 
 This is **not open-source software**. The source code is made available for transparency and auditability, but all rights are reserved by the author.
 

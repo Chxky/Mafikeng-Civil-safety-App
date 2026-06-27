@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getCurrentPosition, reverseGeocode } from '../utils/geolocation';
 // eslint-disable-next-line no-unused-vars
 import { compressImage, CATEGORIES, URGENCY_LEVELS, DEPARTMENTS, CATEGORY_TO_DEPARTMENT, isOnline, showToast } from '../utils/helpers';
-import { submitReport, uploadPhoto } from '../db/mockApi';
+import { submitReport, uploadPhoto } from '../db/api';
 import { addPendingReport, saveDraft, getDrafts, removeDraft } from '../db/offline';
 import { useAuth } from '../hooks/useAuth';
 import { useLanguage } from '../hooks/useLanguage';
